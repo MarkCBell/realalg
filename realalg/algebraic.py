@@ -9,7 +9,7 @@ from numbers import Integral
 import cypari as cp
 import sympy as sp
 
-import realalg
+from .interval import Interval
 
 sp_x = sp.Symbol('x')
 cp_x = cp.pari('x')
@@ -61,7 +61,7 @@ class RealNumberField(object):
         ''' Return intervals around self.lmbda**i that are all correct to at least ``prec`` digits. '''
         if prec > self._prec:
             self._prec = prec
-            self._intervals = [realalg.Interval.from_string(str(sp.N(self.sp_place**i, 2*prec)), prec) for i in range(self.degree)]
+            self._intervals = [Interval.from_string(str(sp.N(self.sp_place**i, 2*prec)), prec) for i in range(self.degree)]
         return [I.simplify(prec) for I in self._intervals]
 
 @total_ordering
@@ -151,7 +151,7 @@ class RealAlgebraic(object):
     def interval(self, precision=8):
         ''' Return an interval around self that is correct to at least ``prec`` digits. '''
         intervals = self.field.intervals(precision)  # TODO: This isn't quite right since later when we multiply by coeffs we may lose a little precision.
-        coeffs = [realalg.Interval.from_fraction(coeff, precision) for coeff in self.coefficients]
+        coeffs = [Interval.from_fraction(coeff, precision) for coeff in self.coefficients]
         return sum(coeff * interval for coeff, interval in zip(coeffs, intervals))
     def N(self, precision=8):
         ''' Return a string approximating self to at least ``prec`` digits. '''
