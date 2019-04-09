@@ -1,7 +1,6 @@
 
 from hypothesis import given, assume
 import hypothesis.strategies as st
-import pytest
 import unittest
 
 import realalg

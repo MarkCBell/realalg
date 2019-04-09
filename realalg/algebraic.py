@@ -36,7 +36,10 @@ class RealNumberField(object):
             raise ValueError('Polynomial {} is reducible'.format(self.cp_polynomial))
         self.degree = self.cp_polynomial.poldegree()
         self.length = sum(log_plus(coefficient.numerator) + log_plus(coefficient.denominator) for coefficient in self.coefficients)
-        self.sp_place = self.sp_polynomial.real_roots()[index]  # Get the real root, will raise an IndexError if no real roots.
+        real_roots = self.sp_polynomial.real_roots()
+        if not real_roots:
+            raise ValueError('Polynomial {} has no real roots'.format(self.cp_polynomial))
+        self.sp_place = real_roots[index]
         self.lmbda = self([0, 1])
         self._prec = 0
         self._intervals = None
