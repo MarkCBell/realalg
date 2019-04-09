@@ -3,9 +3,6 @@ build: false
 
 environment:
   matrix:
-    - PYTHON: "C:\\Python37"
-      TOX_ENV: "docs"
-
     - PYTHON: "C:\\Python27"
       TOX_ENV: "lint2"
 
