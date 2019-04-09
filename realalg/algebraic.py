@@ -91,7 +91,7 @@ class RealAlgebraic(object):
     def __add__(self, other):
         if isinstance(other, RealAlgebraic):
             return RealAlgebraic(self.field, self.cp_mod + other.cp_mod)
-        elif isinstance(other, (Fraction, realalg.IntegerType)):
+        elif isinstance(other, (Fraction, Integral)):
             return self + RealAlgebraic.from_rational(self.field, other)
         else:
             return NotImplemented
