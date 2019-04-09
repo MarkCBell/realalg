@@ -1,5 +1,5 @@
 
-Realalg
+RealAlg
 =======
 
 .. image:: https://img.shields.io/pypi/v/realalg.svg
