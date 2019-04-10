@@ -43,6 +43,7 @@ class RealNumberField(object):
         self.lmbda = self([0, 1])
         self._prec = 0
         self._intervals = None
+        self._bound = max(len(str(abs(int(self.sp_place**i)))) for i in range(self.degree))
     
     def __str__(self):
         return 'QQ(x) / <<{}>> embedding x |--> {}'.format(self.cp_polynomial, self.N())
@@ -59,9 +60,10 @@ class RealNumberField(object):
     
     def intervals(self, prec):
         ''' Return intervals around self.lmbda**i that are all correct to at least ``prec`` digits. '''
+        assert prec > 0
         if prec > self._prec:
             self._prec = prec
-            self._intervals = [Interval.from_string(str(sp.N(self.sp_place**i, 2*prec)), prec) for i in range(self.degree)]
+            self._intervals = [Interval.from_string(str(sp.N(self.sp_place**i, prec + self._bound)), prec) for i in range(self.degree)]
         return [I.simplify(prec) for I in self._intervals]
 
 @total_ordering

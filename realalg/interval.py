@@ -48,6 +48,13 @@ class Interval(object):
         p = self.precision
         l, u = str(self.lower).zfill(p+1), str(self.upper).zfill(p+1)
         return '[{}.{}, {}.{}]'.format(l[:-p], l[-p:], u[:-p], u[-p:])
+    def __eq__(self, other):
+        if not isinstance(other, Interval):
+            return NotImplemented
+        
+        return self.lower == other.lower and self.upper == other.upper and self.precision == other.precision
+    def __ne__(self, other):
+        return not self == other
     
     def __add__(self, other):
         if isinstance(other, Interval):
