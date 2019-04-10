@@ -1,7 +1,5 @@
 
-''' A module for representing and manipulating intervals.
-
-Provides one class: Interval. '''
+''' A module for representing and manipulating intervals. '''
 
 from fractions import Fraction
 from numbers import Integral
@@ -17,18 +15,21 @@ class Interval(object):
         self.lower = lower
         self.upper = upper
         self.precision = precision
+        self.accuracy = self.precision if self.upper == self.lower else self.precision - len(str(abs(self.upper - self.lower)))
     
     @classmethod
     def from_string(cls, string, precision=None):
         ''' A short way of constructing Intervals from a string. '''
         
-        assert '.' in string
+        if not '.' in string:
+            raise ValueError('invalid specification of interval: {}'.format(string))
+        
         if precision is None: precision = len(string.split('.')[1])
-        string = string.ljust(precision, '0')
+        
         i, r = string.split('.')
-        assert len(str(r)) >= precision
-        x = int(i + r[:precision])
-        return cls(x-1, x+1, precision)
+        lower = int(i + r[:precision] + '0' * (precision - len(r)))
+        upper = lower + 10**max(precision - len(r), 0)
+        return cls(lower, upper, precision)
     
     @classmethod
     def from_integer(cls, integer, precision):
