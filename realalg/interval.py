@@ -22,7 +22,7 @@ class Interval(object):
     def from_string(cls, string, precision=None):
         ''' A short way of constructing Intervals from a string. '''
         
-        if not '.' in string:
+        if '.' not in string:
             raise ValueError('invalid specification of interval: {}'.format(string))
         
         if precision is None: precision = len(string.split('.')[1])
