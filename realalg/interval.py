@@ -10,7 +10,8 @@ class Interval(object):
         assert isinstance(lower, Integral)
         assert isinstance(upper, Integral)
         assert isinstance(precision, Integral)
-        if lower > upper: raise ValueError('Interval is empty.')
+        if lower > upper: raise ValueError('Interval is empty')
+        if precision < 1: raise ValueError('Interval must have precision at least 1')
         
         self.lower = lower
         self.upper = upper

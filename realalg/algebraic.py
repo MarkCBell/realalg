@@ -161,6 +161,8 @@ class RealAlgebraic(object):
         return self.interval(precision).midpoint()
     def __int__(self):
         return int(self.interval(2*int(self.length+1)))
+    def __float__(self):
+        return float(self.N(64))
     def sign(self):
         ''' Return the sign of this real number. '''
         return self.interval(2*int(self.length+1)).sign()
