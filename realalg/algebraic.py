@@ -42,7 +42,7 @@ class RealNumberField(object):
             raise ValueError('Polynomial {} has no real roots'.format(self.cp_polynomial))
         self.sp_place = real_roots[index]
         self.lmbda = self([0, 1])
-        self._precision = 0
+        self._accuracy = 0
         self._intervals = None
         self._bound = max(len(str(abs(int(self.sp_place**i)))) for i in range(self.degree))
     
@@ -55,18 +55,18 @@ class RealNumberField(object):
     def __hash__(self):
         return hash(tuple(self.coefficients) + (self.index,))
     
-    def intervals(self, precision):
-        ''' Return intervals around self.lmbda**i that are all correct to at least ``precision`` digits. '''
-        assert isinstance(precision, Integral)
-        assert precision > 0
-        if precision > self._precision:
-            self._precision = precision
-            working_precision = precision + self.degree*self._bound + 1
-            s = str(sp.N(self.sp_place, working_precision))
-            # TODO: deal with e notation.
-            I = Interval.from_string(s, working_precision)
-            self._intervals = [I**i for i in range(self.degree)]
-        return [I.simplify(precision) for I in self._intervals]
+    def intervals(self, accuracy):
+        ''' Return intervals around self.lmbda**i with at least the requested accuracy. '''
+        assert isinstance(accuracy, Integral)
+        assert accuracy > 0
+        if accuracy > self._accuracy:
+            self._accuracy = accuracy
+            precision = int(accuracy + self.degree*self._bound + 1) + 1  # Cheap ceil.
+            s = str(sp.N(self.sp_place, precision))
+            interval = Interval.from_string(s, precision)
+            self._intervals = [interval**i for i in range(self.degree)]
+            assert all(I.accuracy >= accuracy for I in self._intervals)
+        return [I.simplify(accuracy) for I in self._intervals]
 
 @total_ordering
 class RealAlgebraic(object):
@@ -153,16 +153,17 @@ class RealAlgebraic(object):
         ''' Return the degree of this algebraic number. '''
         return self.minpoly().poldegree()
     
-    def interval(self, precision=8):
-        ''' Return an interval around self that is correct to at least ``precision`` digits. '''
-        working_precision = int(precision + self.length + 1)
-        intervals = self.field.intervals(working_precision)
-        coeffs = [Interval.from_fraction(coeff, working_precision) for coeff in self.coefficients]
+    def interval(self, accuracy=8):
+        ''' Return an interval around self with at least the requested accuracy. '''
+        precision = int(accuracy + self.length + 1) + 1  # Cheap ceil.
+        intervals = self.field.intervals(precision)
+        coeffs = [Interval.from_fraction(coeff, precision) for coeff in self.coefficients]
         interval = sum(coeff * interval for coeff, interval in zip(coeffs, intervals))
-        return interval.simplify(precision)
-    def N(self, precision=8):
-        ''' Return a string approximating self to at least ``precision`` digits. '''
-        return self.interval(precision).midpoint()
+        assert interval.accuracy >= accuracy
+        return interval.simplify(accuracy)
+    def N(self, accuracy=8):
+        ''' Return a string approximating self to at least ``accuracy`` digits. '''
+        return self.interval(accuracy).midpoint()
     def __int__(self):
         return int(self.interval(2*int(self.length+1)))
     def __float__(self):

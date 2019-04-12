@@ -25,7 +25,6 @@ class Interval(object):
         if '.' not in string:
             raise ValueError('invalid specification of interval: {}'.format(string))
         if 'e' in string:
-            print(string)
             d, _, p = string.partition('e')
             p = int(p)
             if p < 0:
@@ -33,7 +32,6 @@ class Interval(object):
             else:
                 i, r = d.split('.')
                 string = i + r[:p] + '.' + r[p:]
-            print(string)
         
         if precision is None: precision = len(string.split('.')[1])
         
@@ -110,7 +108,7 @@ class Interval(object):
         I = Interval.from_integer(1, self.precision)
         while power:
             if power & 1: I = I * self
-            self = self * self
+            self = self * self  # pylint: disable=self-cls-assignment
             power >>= 1
         return I
     
