@@ -96,6 +96,13 @@ class Interval(object):
             return NotImplemented
     def __rmul__(self, other):
         return self * other
+    def __pow__(self, power):
+        I = Interval.from_integer(1, self.precision)
+        while power:
+            if power & 1: I = I * self
+            self = self * self
+            power >>= 1
+        return I
     
     def __int__(self):
         return self.upper // 10**self.precision
