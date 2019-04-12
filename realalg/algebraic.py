@@ -61,8 +61,11 @@ class RealNumberField(object):
         assert precision > 0
         if precision > self._precision:
             self._precision = precision
-            # TODO: Make this only use a single call to sp.N.
-            self._intervals = [Interval.from_string(str(sp.N(self.sp_place**i, precision + self._bound + 1)), precision) for i in range(self.degree)]
+            working_precision = precision + self.degree*self._bound + 1
+            s = str(sp.N(self.sp_place, working_precision))
+            # TODO: deal with e notation.
+            I = Interval.from_string(s, working_precision)
+            self._intervals = [I**i for i in range(self.degree)]
         return [I.simplify(precision) for I in self._intervals]
 
 @total_ordering
@@ -153,7 +156,7 @@ class RealAlgebraic(object):
     def interval(self, precision=8):
         ''' Return an interval around self that is correct to at least ``precision`` digits. '''
         working_precision = int(precision + self.length + 1)
-        intervals = self.field.intervals(working_precision)  # TODO: This isn't quite right since later when we multiply by coeffs we may lose a little precision.
+        intervals = self.field.intervals(working_precision)
         coeffs = [Interval.from_fraction(coeff, working_precision) for coeff in self.coefficients]
         interval = sum(coeff * interval for coeff, interval in zip(coeffs, intervals))
         return interval.simplify(precision)

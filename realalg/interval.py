@@ -24,6 +24,16 @@ class Interval(object):
         
         if '.' not in string:
             raise ValueError('invalid specification of interval: {}'.format(string))
+        if 'e' in string:
+            print(string)
+            d, _, p = string.partition('e')
+            p = int(p)
+            if p < 0:
+                string = ('-' if d.startswith('-') else '') + '0.' + '0' * (-1-p) + d.replace('.', '').replace('-', '')
+            else:
+                i, r = d.split('.')
+                string = i + r[:p] + '.' + r[p:]
+            print(string)
         
         if precision is None: precision = len(string.split('.')[1])
         
@@ -48,7 +58,7 @@ class Interval(object):
         return str(self)
     def __str__(self):
         p = self.precision
-        l, u = str(self.lower).zfill(p+1), str(self.upper).zfill(p+1)
+        l, u = str(self.lower).zfill(p + (1 if self.lower >= 0 else 2)), str(self.upper).zfill(p + (1 if self.lower >= 0 else 2))
         return '[{}.{}, {}.{}]'.format(l[:-p], l[-p:], u[:-p], u[-p:])
     def __eq__(self, other):
         if not isinstance(other, Interval):
