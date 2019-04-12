@@ -106,9 +106,10 @@ class Interval(object):
         return self * other
     def __pow__(self, power):
         I = Interval.from_integer(1, self.precision)
+        powered = self
         while power:
-            if power & 1: I = I * self
-            self = self * self  # pylint: disable=self-cls-assignment
+            if power & 1: I *= self
+            powered *= powered
             power >>= 1
         return I
     
