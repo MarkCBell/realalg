@@ -30,6 +30,7 @@ class RealNumberField(object):
     ''' Represents the NumberField QQ(lmbda) = QQ[x] / << f(x) >> where lmbda is a real root of f(x). '''
     def __init__(self, coefficients, index=-1):  # List of integers and / or Fractions, integer index
         self.coefficients = [Fraction(coefficient) for coefficient in coefficients]
+        self.index = index
         self.sp_polynomial = sp_polynomial(self.coefficients)
         self.cp_polynomial = cp_polynomial(self.coefficients)
         if not self.cp_polynomial.polisirreducible():
@@ -41,30 +42,28 @@ class RealNumberField(object):
             raise ValueError('Polynomial {} has no real roots'.format(self.cp_polynomial))
         self.sp_place = real_roots[index]
         self.lmbda = self([0, 1])
-        self._prec = 0
+        self._precision = 0
         self._intervals = None
         self._bound = max(len(str(abs(int(self.sp_place**i)))) for i in range(self.degree))
     
     def __str__(self):
-        return 'QQ(x) / <<{}>> embedding x |--> {}'.format(self.cp_polynomial, self.N())
+        return 'QQ(x) / <<{}>> embedding x |--> {}'.format(self.cp_polynomial, self.lmbda)
     def __repr__(self):
         return str(self)
     def __call__(self, coefficients):
         return RealAlgebraic.from_coefficients(self, coefficients)
     def __hash__(self):
-        return hash(tuple(self.coefficients))
-    def N(self, prec=8):
-        ''' Return the string approximating the fields root correct to at least ``prec`` digits. '''
-        prec = max(prec, 2*(int(self.length)+1))
-        return str(sp.N(self.sp_place, prec))
+        return hash(tuple(self.coefficients) + (self.index,))
     
-    def intervals(self, prec):
-        ''' Return intervals around self.lmbda**i that are all correct to at least ``prec`` digits. '''
-        assert prec > 0
-        if prec > self._prec:
-            self._prec = prec
-            self._intervals = [Interval.from_string(str(sp.N(self.sp_place**i, prec + self._bound)), prec) for i in range(self.degree)]
-        return [I.simplify(prec) for I in self._intervals]
+    def intervals(self, precision):
+        ''' Return intervals around self.lmbda**i that are all correct to at least ``precision`` digits. '''
+        assert isinstance(precision, Integral)
+        assert precision > 0
+        if precision > self._precision:
+            self._precision = precision
+            # TODO: Make this only use a single call to sp.N.
+            self._intervals = [Interval.from_string(str(sp.N(self.sp_place**i, precision + self._bound + 1)), precision) for i in range(self.degree)]
+        return [I.simplify(precision) for I in self._intervals]
 
 @total_ordering
 class RealAlgebraic(object):
@@ -152,12 +151,14 @@ class RealAlgebraic(object):
         return self.minpoly().poldegree()
     
     def interval(self, precision=8):
-        ''' Return an interval around self that is correct to at least ``prec`` digits. '''
-        intervals = self.field.intervals(precision)  # TODO: This isn't quite right since later when we multiply by coeffs we may lose a little precision.
-        coeffs = [Interval.from_fraction(coeff, precision) for coeff in self.coefficients]
-        return sum(coeff * interval for coeff, interval in zip(coeffs, intervals))
+        ''' Return an interval around self that is correct to at least ``precision`` digits. '''
+        working_precision = int(precision + self.length + 1)
+        intervals = self.field.intervals(working_precision)  # TODO: This isn't quite right since later when we multiply by coeffs we may lose a little precision.
+        coeffs = [Interval.from_fraction(coeff, working_precision) for coeff in self.coefficients]
+        interval = sum(coeff * interval for coeff, interval in zip(coeffs, intervals))
+        return interval.simplify(precision)
     def N(self, precision=8):
-        ''' Return a string approximating self to at least ``prec`` digits. '''
+        ''' Return a string approximating self to at least ``precision`` digits. '''
         return self.interval(precision).midpoint()
     def __int__(self):
         return int(self.interval(2*int(self.length+1)))

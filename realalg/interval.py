@@ -102,12 +102,15 @@ class Interval(object):
     
     def midpoint(self):
         ''' Return a string describing the midpoint of this interval. '''
-        m = str((self.lower + self.upper) // 2).zfill(self.precision+1)
-        return '{}.{}'.format(m[:-self.precision], m[-self.precision:])
+        m = (self.lower + self.upper) // 2
+        ms = str(m).zfill(self.precision + (1 if m >= 0 else 2))  # Amount of padding depends upon sign.
+        return '{}.{}'.format(ms[:-self.precision], ms[-self.precision:])
     
     def simplify(self, new_precision):
         ''' Return a larger interval containing this of the given precision. '''
-        assert new_precision <= self.precision
+        if new_precision > self.precision:
+            raise ValueError('new_precision must be less than or equal to self.precision')
+        
         d = self.precision - new_precision
         return Interval(self.lower // 10**d, self.upper // 10**d, new_precision)
     
