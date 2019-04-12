@@ -108,7 +108,7 @@ class Interval(object):
         I = Interval.from_integer(1, self.precision)
         powered = self
         while power:
-            if power & 1: I *= self
+            if power & 1: I *= powered
             powered *= powered
             power >>= 1
         return I
