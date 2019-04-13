@@ -29,6 +29,10 @@ def cp_polynomial(coefficients):
 class RealNumberField(object):
     ''' Represents the NumberField QQ(lmbda) = QQ[x] / << f(x) >> where lmbda is a real root of f(x). '''
     def __init__(self, coefficients, index=-1):  # List of integers and / or Fractions, integer index
+        if len(coefficients) < 3:
+            raise ValueError('Degree of Polynomial must be at least two')
+        if not coefficients[-1]:
+            raise ValueError('Leading coefficient must be non-zero')
         self.coefficients = [Fraction(coefficient) for coefficient in coefficients]
         self.index = index
         self.sp_polynomial = sp_polynomial(self.coefficients)
@@ -49,7 +53,7 @@ class RealNumberField(object):
     def __str__(self):
         return 'QQ(x) / <<{}>> embedding x |--> {}'.format(self.cp_polynomial, self.lmbda)
     def __repr__(self):
-        return str(self)
+        return 'RealNumberField({})'.format(self.coefficients)
     def __call__(self, coefficients):
         return RealAlgebraic.from_coefficients(self, coefficients)
     def __hash__(self):
@@ -60,12 +64,12 @@ class RealNumberField(object):
         assert isinstance(accuracy, Integral)
         assert accuracy > 0
         if accuracy > self._accuracy:
-            self._accuracy = accuracy
             precision = int(accuracy + self.degree*self._bound + 1) + 1  # Cheap ceil.
             s = str(sp.N(self.sp_place, precision))
             interval = Interval.from_string(s, precision)
             self._intervals = [interval**i for i in range(self.degree)]
             assert all(I.accuracy >= accuracy for I in self._intervals)
+            self._accuracy = accuracy
         return [I.simplify(accuracy) for I in self._intervals]
 
 @total_ordering
@@ -91,7 +95,7 @@ class RealAlgebraic(object):
     def __str__(self):
         return str(self.N())
     def __repr__(self):
-        return str(self)
+        return '{!r}({})'.format(self.field, self.coefficients)
     def __add__(self, other):
         if isinstance(other, RealAlgebraic):
             return RealAlgebraic(self.field, self.cp_mod + other.cp_mod)
@@ -156,9 +160,7 @@ class RealAlgebraic(object):
     def interval(self, accuracy=8):
         ''' Return an interval around self with at least the requested accuracy. '''
         precision = int(accuracy + self.length + 1) + 1  # Cheap ceil.
-        intervals = self.field.intervals(precision)
-        coeffs = [Interval.from_fraction(coeff, precision) for coeff in self.coefficients]
-        interval = sum(coeff * interval for coeff, interval in zip(coeffs, intervals))
+        interval = sum(coeff * interval for coeff, interval in zip(self.coefficients, self.field.intervals(precision)))
         assert interval.accuracy >= accuracy
         return interval.simplify(accuracy)
     def N(self, accuracy=8):

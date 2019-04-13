@@ -10,15 +10,15 @@ def intervals(draw, precision=None):
     if precision is None: precision = draw(st.integers(min_value=1, max_value=100))
     lower = draw(st.integers())
     upper = draw(st.integers(min_value=lower))
-    return realalg.interval.Interval(lower, upper, precision)
+    return realalg.Interval(lower, upper, precision)
 
 @st.composite
-def realnumberfields(draw, degree=None):
-    if degree is None: degree = draw(st.integers(min_value=2, max_value=10))
+def realnumberfields(draw):
     while True:
-        coeffs = draw(st.lists(elements=st.integers(), min_size=degree, max_size=degree)) + [1]
-        assume(coeffs[0])
-        try:  # Only 1 / degree of the polynomials are irreducible.
+        coeffs = draw(st.one_of(
+            st.integers(min_value=2).map(lambda n: [-n, 0, 1]),
+            ))
+        try:
             return realalg.RealNumberField(coeffs)
         except ValueError:
             pass
@@ -29,6 +29,7 @@ def realalgebraics(draw, field=None):
     coefficients = draw(st.lists(elements=st.integers()))
     assume(coefficients)
     return field(coefficients)
+
 
 class TestStrategiesHealth(unittest.TestCase):
     @given(realnumberfields())
@@ -42,8 +43,4 @@ class TestStrategiesHealth(unittest.TestCase):
     @given(intervals())
     def test_intervals(self, I):
         self.assertIsInstance(I, realalg.interval.Interval)
-
-
-if __name__ == '__main__':
-    unittest.main()
 

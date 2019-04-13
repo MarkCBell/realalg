@@ -18,13 +18,6 @@ class TestRealAlgebraic(unittest.TestCase):
         self.assertEqual(alpha + beta, beta + alpha)
         self.assertEqual(alpha + const, const + alpha)
     
-    @given(st.data())
-    def test_conversion(self, data):
-        K = data.draw(strategies.realnumberfields())
-        alpha = data.draw(strategies.realalgebraics(field=K))
-        beta = data.draw(strategies.realalgebraics(field=K))
-        self.assertAlmostEqual(float(alpha + beta), float(alpha) + float(beta))
-    
     @given(strategies.realalgebraics())
     def test_pickle(self, alpha):
         self.assertEqual(alpha, pickle.loads(pickle.dumps(alpha)))
