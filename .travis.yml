@@ -36,6 +36,7 @@ jobs:
         provider: pypi
         user: mark_bell
         password:
+          secure: sP76rHky1CISVUVTrT3R36oDoW9Vig88qrXGZwukU38RzwEjRBfRqLn6HP3D8XPTFDoTnGwxZLtkau3ALoxtIYCtd3q3MtYM6wBSYfeO8pD5GOHChbp+oXIDB4y7/voqyGEXFrXnx6wX4bWuBaeUuY3DDBTDMsvSvZFWNuJH4pxUwV3UyM5eDWHjs0MDxdp23NocROrFoklEPWAgz59l6Bv0I41ieLW5x/lgykeWlvywlwgMCs8rBVmRVuH3ArlUqhNcS0m2GIIavdtjyHvUNGg68AbNbkZtag/Z2h9CTR2ewRx6kXmxQmWt8Y+YNQb2YXQxXBOmcsp3fDIlVeyoC6xxG7XTs5ngZUnRy+OX5sJh9fm2C9K5rITqzYj0XRA4c3VcP7xMMXyD8OoFxTi8PP9n0J7YlpOOm77tOzzfEKgxJgIwVO1f9GSQXIxzeymW3aN9wpBrdQGYX5ILFe75CW+spc2HnJNjyalbqpeSDtWod9ETcqeUm936Ff7u4w3tKOfuGyojuuplKmkKXaYJdlTFjfa6jZ+EOxGEHahPvpVKPKhooI3hCuj3Q85p2wHg+Ujr+JBy7fHGYxV/EQZo1IyV2z8gzoofRjHAu5Gs9YVPV2rtDyCXO2ZPrEom06D8e4hpKmbp8JpcfDitMThJs6/67kv7tAiQ2Yhn3aCu3Bc=
         on:
           tags: true
 
