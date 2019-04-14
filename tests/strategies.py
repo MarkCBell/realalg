@@ -5,6 +5,19 @@ import unittest
 
 import realalg
 
+def is_square(n):
+    ''' Return whether n > 1 is a square using the Babylonian algorithm. '''
+    s = (len(str(n))-1) // 2
+    x = (10**s) * 4  # A good guess for the root.
+
+    A = set([x, n])
+    while x * x != n:
+        x = (x + (n // x)) >> 1
+        if x in A:
+            return False
+        A.add(x)
+    return True  # x = sqrt(n).
+
 @st.composite
 def intervals(draw, precision=None):
     if precision is None: precision = draw(st.integers(min_value=1, max_value=100))
@@ -16,8 +29,9 @@ def intervals(draw, precision=None):
 def realnumberfields(draw):
     while True:
         coeffs = draw(st.one_of(
-            st.integers(min_value=2).map(lambda n: [-n, 0, 1]),
+            st.integers(min_value=2, max_value=50).filter(lambda n: not is_square(n)).map(lambda n: [-n, 0, 1]),
             ))
+        print(coeffs)
         try:
             return realalg.RealNumberField(coeffs)
         except ValueError:  # Might be reducible or have no real roots.
