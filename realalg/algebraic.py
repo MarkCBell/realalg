@@ -51,7 +51,7 @@ class RealNumberField(object):
         self._bound = max(len(str(abs(int(self.sp_place**i)))) for i in range(self.degree))
     
     def __str__(self):
-        return 'QQ(x) / <<{}>> embedding x |--> {}'.format(self.cp_polynomial, self.lmbda)
+        return 'QQ[x] / <<{}>> embedding x |--> {}'.format(self.cp_polynomial, self.lmbda)
     def __repr__(self):
         return 'RealNumberField({})'.format(self.coefficients)
     def __call__(self, coefficients):
@@ -70,7 +70,7 @@ class RealNumberField(object):
             self._intervals = [interval**i for i in range(self.degree)]
             assert all(I.accuracy >= accuracy for I in self._intervals)
             self._accuracy = accuracy
-        return [I.simplify(accuracy) for I in self._intervals]
+        return [I.simplify(accuracy+1) for I in self._intervals]
 
 @total_ordering
 class RealAlgebraic(object):
@@ -162,7 +162,7 @@ class RealAlgebraic(object):
         precision = int(accuracy + self.length + 1) + 1  # Cheap ceil.
         interval = sum(coeff * interval for coeff, interval in zip(self.coefficients, self.field.intervals(precision)))
         assert interval.accuracy >= accuracy
-        return interval.simplify(accuracy)
+        return interval.simplify(accuracy+1)
     def N(self, accuracy=8):
         ''' Return a string approximating self to at least ``accuracy`` digits. '''
         return self.interval(accuracy).midpoint()

@@ -20,7 +20,7 @@ def realnumberfields(draw):
             ))
         try:
             return realalg.RealNumberField(coeffs)
-        except ValueError:
+        except ValueError:  # Might be reducible or have no real roots.
             pass
 
 @st.composite

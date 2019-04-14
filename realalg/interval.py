@@ -128,7 +128,7 @@ class Interval(object):
             raise ValueError('new_precision must be less than or equal to self.precision')
         
         d = self.precision - new_precision
-        return Interval(self.lower // 10**d, self.upper // 10**d, new_precision)
+        return Interval(self.lower // 10**d, -(-self.upper // 10**d), new_precision)  # Divide and round down / up without using math.ceil.
     
     def sign(self):
         ''' Return the sign of this interval.
