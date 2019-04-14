@@ -10,8 +10,8 @@ RealAlg
     :target: https://pypi.org/project/realalg/
     :alt: PyPI license
 
-.. image:: https://travis-ci.org/MarkCBell/realalg.svg?branch=master
-    :target: https://travis-ci.org/MarkCBell/realalg
+.. image:: https://api.travis-ci.org/MarkCBell/realalg.svg?branch=master
+    :target: https://travis-ci.com/MarkCBell/realalg/
     :alt: Travis build status
 
 .. image:: https://img.shields.io/coveralls/github/MarkCBell/realalg.svg?branch=master
