@@ -21,7 +21,7 @@ RealAlg
 Realalg provides real algebraic numbers (embedded into R).
 
 It officially supports Python 2.7 and 3.5 -- 3.7.
-It also runs on `Sage`_ which is currently the fastest way to run it.
+It also runs on `PyPy`_ and `Sage`_.
 
 .. note:: The use of **Python 3** is *highly* preferred over Python 2.
     Consider upgrading your applications and infrastructure if you find yourself *still* using Python 2 in production today.
@@ -45,4 +45,5 @@ External Links
 .. _Sage: http://www.sagemath.org
 .. _Travis: https://travis-ci.org/MarkCBell/realalg
 .. _Coveralls: https://coveralls.io/github/MarkCBell/realalg
+.. _PyPy: https://pypy.org/
 
