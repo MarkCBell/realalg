@@ -27,15 +27,15 @@ def intervals(draw, precision=None):
 
 @st.composite
 def realnumberfields(draw):
-    while True:
-        coeffs = draw(st.one_of(
-            st.integers(min_value=2, max_value=50).filter(lambda n: not is_square(n)).map(lambda n: [-n, 0, 1]),
-            ))
-        print(coeffs)
-        try:
-            return realalg.RealNumberField(coeffs)
-        except ValueError:  # Might be reducible or have no real roots.
-            pass
+    coeffs = draw(st.one_of(
+        st.integers(min_value=2, max_value=50).filter(lambda n: not is_square(n)).map(lambda n: [-n, 0, 1]),  # QQ(sqrt(n)).
+        st.integers(min_value=1, max_value=10).map(lambda n: [-2] + [0]*n + [1]),  # QQ(nth-root(2)).
+        st.sampled_from([[-2, 0, 0, 1], [-1, 0, 1, 1], [-1, -2, 1, 1], [-1, -3, 1, 1]]),  # From https://en.wikipedia.org/wiki/Cubic_field#Examples.
+        ))
+    try:
+        return realalg.RealNumberField(coeffs)
+    except ValueError:  # Might be reducible or have no real roots.
+        pass
 
 @st.composite
 def realalgebraics(draw, field=None):
