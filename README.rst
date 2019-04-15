@@ -43,7 +43,7 @@ External Links
 .. _PyPI: https://pypi.python.org/pypi/realalg
 .. _ReadTheDocs: http://realalg.readthedocs.io
 .. _Sage: http://www.sagemath.org
-.. _Travis: https://travis-ci.org/MarkCBell/realalg
+.. _Travis: https://travis-ci.com/MarkCBell/realalg
 .. _Coveralls: https://coveralls.io/github/MarkCBell/realalg
 .. _PyPy: https://pypy.org/
 
