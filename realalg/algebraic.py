@@ -107,6 +107,8 @@ class RealAlgebraic(object):
         return self + other
     def __sub__(self, other):
         return self + (-other)
+    def __rsub__(self, other):
+        return other + (-self)
     def __neg__(self):
         return RealAlgebraic(self.field, -self.cp_mod)
     def __mul__(self, other):
@@ -172,7 +174,14 @@ class RealAlgebraic(object):
         return float(self.N(64))
     def sign(self):
         ''' Return the sign of this real number. '''
-        return self.interval(2*int(self.length+1)).sign()
+        d = 1
+        while d < 2*int(self.length+1):
+            potential_sign = self.interval(accuracy=d).sign()
+            if potential_sign:  # sign is 'obvious' at this point.
+                return potential_sign
+            d = d * 2
+        
+        return 0  # self == 0.
     def __eq__(self, other):
         return (self - other).sign() == 0
     def __gt__(self, other):
