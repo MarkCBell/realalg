@@ -169,19 +169,23 @@ class RealAlgebraic(object):
         ''' Return a string approximating self to at least ``accuracy`` digits. '''
         return self.interval(accuracy).midpoint()
     def __int__(self):
-        return int(self.interval(2*int(self.length+1)))
+        return int(self.interval())
     def __float__(self):
         return float(self.N(64))
     def sign(self):
         ''' Return the sign of this real number. '''
+        if not any(self.coefficients):  # self == 0.
+            return 0
+        
         d = 1
-        while d < 2*int(self.length+1):
+        while True:
             potential_sign = self.interval(accuracy=d).sign()
             if potential_sign:  # sign is 'obvious' at this point.
                 return potential_sign
+            if d > 2*int(self.length+1):
+                raise RuntimeError('Should be zero')  # self == 0.
             d = d * 2
-        
-        return 0  # self == 0.
+    
     def __eq__(self, other):
         return (self - other).sign() == 0
     def __gt__(self, other):
