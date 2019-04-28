@@ -123,7 +123,9 @@ class RealAlgebraic(object):
     def __div__(self, other):
         return self.__truediv__(other)
     def __floordiv__(self, other):
-        # Can do this much more efficiently.
+        if other == 0:
+            raise ZeroDivisionError
+        
         return int(self / other)
     def __truediv__(self, other):
         if other == 0:
