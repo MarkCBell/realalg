@@ -111,6 +111,8 @@ class RealAlgebraic(object):
         return other + (-self)
     def __neg__(self):
         return RealAlgebraic(self.field, -self.cp_mod)
+    def __abs__(self):
+        return self if self > 0 else -self
     def __mul__(self, other):
         if isinstance(other, RealAlgebraic):
             return RealAlgebraic(self.field, self.cp_mod * other.cp_mod)
