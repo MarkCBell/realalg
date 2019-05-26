@@ -101,6 +101,8 @@ class RealAlgebraic(object):
             return RealAlgebraic(self.field, self.cp_mod + other.cp_mod)
         elif isinstance(other, (Fraction, Integral)):
             return self + RealAlgebraic.from_rational(self.field, other)
+        elif isinstance(other, float):
+            return float(self) + other
         else:
             return NotImplemented
     def __radd__(self, other):
@@ -118,6 +120,8 @@ class RealAlgebraic(object):
             return RealAlgebraic(self.field, self.cp_mod * other.cp_mod)
         elif isinstance(other, (Fraction, Integral)):
             return self * RealAlgebraic.from_rational(self.field, other)
+        elif isinstance(other, float):
+            return float(self) * other
         else:
             return NotImplemented
     def __rmul__(self, other):
@@ -129,6 +133,12 @@ class RealAlgebraic(object):
             raise ZeroDivisionError
         
         return int(self / other)
+        # Something like:
+        #   accuracy = int(self.length + other.length) + 1
+        #   I = self.interval(accuracy)
+        #   J = other.interval(accuracy)
+        #   return I.upper // J.lower
+        # Should be much more efficient.
     def __truediv__(self, other):
         if other == 0:
             raise ZeroDivisionError('division by zero')
@@ -136,6 +146,8 @@ class RealAlgebraic(object):
             return RealAlgebraic(self.field, self.cp_mod / other.cp_mod)
         elif isinstance(other, (Fraction, Integral)):
             return self / RealAlgebraic.from_rational(self.field, other)
+        elif isinstance(other, float):
+            return float(self) / other
         else:
             return NotImplemented
     def __rdiv__(self, other):
@@ -146,10 +158,7 @@ class RealAlgebraic(object):
         else:
             return NotImplemented
     def __mod__(self, other):
-        if isinstance(other, Integral):
-            return self - int(self / other) * other
-        else:
-            return NotImplemented
+        return self - (self // other) * other
     def __pow__(self, other):
         if isinstance(other, Integral):
             return RealAlgebraic(self.field, self.cp_mod ** other)
