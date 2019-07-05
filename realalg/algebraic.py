@@ -96,6 +96,8 @@ class RealAlgebraic(object):
         return str(self.N())
     def __repr__(self):
         return '{!r}({})'.format(self.field, self.coefficients)
+    def __pos__(self):
+        return self
     def __add__(self, other):
         if isinstance(other, RealAlgebraic):
             return RealAlgebraic(self.field, self.cp_mod + other.cp_mod)
