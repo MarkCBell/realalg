@@ -6,13 +6,14 @@ from functools import total_ordering
 from math import log10 as log
 from numbers import Integral
 
-import cypari as cp
 import sympy as sp
+import cypari2
 
 from .interval import Interval
 
 sp_x = sp.Symbol('x')
-cp_x = cp.pari('x')
+cp = cypari2.Pari()
+cp_x = cp('x')
 
 def log_plus(x):
     ''' Return the height of the number ``x``. '''
@@ -24,7 +25,7 @@ def sp_polynomial(coefficients):
 
 def cp_polynomial(coefficients):
     ''' Return the cypari polynomial with the given coefficients. '''
-    return cp.pari(' + '.join('{}*x^{}'.format(coefficient, index) for index, coefficient in enumerate(coefficients)))
+    return cp(' + '.join('{}*x^{}'.format(coefficient, index) for index, coefficient in enumerate(coefficients)))
 
 class RealNumberField(object):
     ''' Represents the NumberField QQ(lmbda) = QQ[x] / << f(x) >> where lmbda is a real root of f(x). '''
