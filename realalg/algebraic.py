@@ -10,9 +10,12 @@ import sympy as sp
 try:
     import cypari2
     cp = cypari2.Pari()
-except ModuleNotFoundError:
-    import cypari
-    cp = cypari.pari
+except ImportError:
+    try:
+        import cypari
+        cp = cypari.pari
+    except ImportError:
+        raise Exception("You need to install cypari or cypari2 to use the realalg module. Try pip install cypari.")
 
 from .interval import Interval
 
