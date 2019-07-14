@@ -7,12 +7,16 @@ from math import log10 as log
 from numbers import Integral
 
 import sympy as sp
-import cypari2
+try:
+    import cypari2
+    cp = cypari2.Pari()
+except ModuleNotFoundError:
+    import cypari
+    cp = cypari.pari
 
 from .interval import Interval
 
 sp_x = sp.Symbol('x')
-cp = cypari2.Pari()
 cp_x = cp('x')
 
 def log_plus(x):
