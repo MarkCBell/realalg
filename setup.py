@@ -5,11 +5,10 @@
 
 from setuptools import setup, find_packages
 
-requirements = [
 # We need one of cypari or cypari2 to interface with PARI. Since we do not
 # want to lock in the user to either version explicitly, we do not add a
 # dependency here but complain at runtime if neither can be found.
-# 'cypari',
+requirements = [
     'sympy',
 ]
 
