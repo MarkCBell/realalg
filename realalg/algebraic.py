@@ -15,7 +15,7 @@ except ImportError:
         import cypari
         cp = cypari.pari
     except ImportError:
-        raise Exception("You need to install cypari or cypari2 to use the realalg module. Try pip install cypari.")
+        raise Exception("You need to install cypari or cypari2 to use the realalg module. Try pip install cypari2.")
 
 from .interval import Interval
 
