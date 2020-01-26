@@ -55,7 +55,7 @@ class RealNumberField(object):
     def __repr__(self):
         return 'RealNumberField({})'.format(self.coefficients)
     def __call__(self, coefficients):
-        return RealAlgebraic.from_coefficients(self, coefficients)
+        return RealAlgebraic(self, cp_polynomial(coefficients).Mod(self.cp_polynomial))
     def __hash__(self):
         return hash(tuple(self.coefficients) + (self.index,))
     
@@ -84,25 +84,21 @@ class RealAlgebraic(object):
         if not self.coefficients:
             self.coefficients = [Fraction(0, 1)]
         self.length = sum(log_plus(coefficient.numerator) + log_plus(coefficient.denominator) + index * self.field.length for index, coefficient in enumerate(self.coefficients))
-    @classmethod
-    def from_coefficients(cls, field, coefficients):
-        ''' Return the element of the field with the given coefficients. '''
-        return cls(field, cp_polynomial(coefficients).Mod(field.cp_polynomial))
-    @classmethod
-    def from_rational(cls, field, rational):
-        ''' Return the element of QQ within the given field. '''
-        return cls(field, cp_polynomial([rational]).Mod(field.cp_polynomial))
     def __str__(self):
         return str(self.N())
     def __repr__(self):
         return '{!r}({})'.format(self.field, self.coefficients)
+    def __bool__(self):
+        return self.coefficients != [Fraction(0, 1)]
+    def __nonzero__(self):  # For Python2.
+        return self.__bool__()
     def __pos__(self):
         return self
     def __add__(self, other):
         if isinstance(other, RealAlgebraic):
             return RealAlgebraic(self.field, self.cp_mod + other.cp_mod)
         elif isinstance(other, (Fraction, Integral)):
-            return self + RealAlgebraic.from_rational(self.field, other)
+            return self + self.field([other])
         elif isinstance(other, float):
             return float(self) + other
         else:
@@ -114,14 +110,14 @@ class RealAlgebraic(object):
     def __rsub__(self, other):
         return other + (-self)
     def __neg__(self):
-        return RealAlgebraic(self.field, -self.cp_mod)
+        return RealAlgebraic(self.field, -self.sp_mod)
     def __abs__(self):
         return self if self > 0 else -self
     def __mul__(self, other):
         if isinstance(other, RealAlgebraic):
             return RealAlgebraic(self.field, self.cp_mod * other.cp_mod)
         elif isinstance(other, (Fraction, Integral)):
-            return self * RealAlgebraic.from_rational(self.field, other)
+            return self * self.field([other])
         elif isinstance(other, float):
             return float(self) * other
         else:
@@ -145,9 +141,9 @@ class RealAlgebraic(object):
         if other == 0:
             raise ZeroDivisionError('division by zero')
         if isinstance(other, RealAlgebraic):
-            return RealAlgebraic(self.field, self.cp_mod / other.cp_mod)
+            return RealAlgebraic(self.field, self.sp_mod / other.sp_mod)
         elif isinstance(other, (Fraction, Integral)):
-            return self / RealAlgebraic.from_rational(self.field, other)
+            return self / self.field([other])
         elif isinstance(other, float):
             return float(self) / other
         else:
@@ -202,9 +198,33 @@ class RealAlgebraic(object):
             d = d * 2
     
     def __eq__(self, other):
-        return (self - other).sign() == 0
+        return not (self - other)
+    def __ne__(self, other):
+        return not self == other
     def __gt__(self, other):
+        if isinstance(other, Integral):
+            I = self.interval()
+            if I.lower > other * 10**I.precision: return True
+        elif isinstance(other, RealAlgebraic):
+            I = self.interval()
+            J = other.interval()
+            if I.lower * 10**J.precision > J.upper * 10**I.precision: return True
+        
         return (self - other).sign() == +1
+    def __ge__(self, other):
+        return self > other or self == other
+    def __lt__(self, other):
+        if isinstance(other, Integral):
+            I = self.interval()
+            if I.upper < other * 10**I.precision: return True
+        elif isinstance(other, RealAlgebraic):
+            I = self.interval()
+            J = other.interval()
+            if I.upper * 10**J.precision < J.lower * 10**I.precision: return True
+        
+        return (self - other).sign() == -1
+    def __le__(self, other):
+        return self < other or self == other
     def __hash__(self):
         return hash(tuple(self.coefficients))
 
