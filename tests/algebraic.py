@@ -37,3 +37,4 @@ class TestRealAlgebraic(unittest.TestCase):
     @given(strategies.realalgebraics())
     def test_pickle(self, alpha):
         self.assertEqual(alpha, pickle.loads(pickle.dumps(alpha)))
+
