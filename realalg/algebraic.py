@@ -110,7 +110,7 @@ class RealAlgebraic(object):
     def __rsub__(self, other):
         return other + (-self)
     def __neg__(self):
-        return RealAlgebraic(self.field, -self.sp_mod)
+        return RealAlgebraic(self.field, -self.cp_mod)
     def __abs__(self):
         return self if self > 0 else -self
     def __mul__(self, other):
@@ -141,7 +141,7 @@ class RealAlgebraic(object):
         if other == 0:
             raise ZeroDivisionError('division by zero')
         if isinstance(other, RealAlgebraic):
-            return RealAlgebraic(self.field, self.sp_mod / other.sp_mod)
+            return RealAlgebraic(self.field, self.cp_mod / other.cp_mod)
         elif isinstance(other, (Fraction, Integral)):
             return self / self.field([other])
         elif isinstance(other, float):
