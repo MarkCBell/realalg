@@ -3,17 +3,8 @@ build: false
 
 environment:
   matrix:
-    - PYTHON: "C:\\Python27"
-      TOX_ENV: "lint2"
-
-    - PYTHON: "C:\\Python36"
-      TOX_ENV: "lint3"
-
-    - PYTHON: "C:\\Python27"
-      TOX_ENV: "py27"
-
-    - PYTHON: "C:\\Python35"
-      TOX_ENV: "py35"
+    - PYTHON: "C:\\Python38"
+      TOX_ENV: "lint"
 
     - PYTHON: "C:\\Python36"
       TOX_ENV: "py36"
@@ -21,15 +12,18 @@ environment:
     - PYTHON: "C:\\Python37"
       TOX_ENV: "py37"
 
+    - PYTHON: "C:\\Python38"
+      TOX_ENV: "py38"
+
 init:
   - set "PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - echo "%PYTHON%"
   - python.exe -c "import sys; print(sys.version)"
+  - pip --version
 
 install:
-  - pip.exe install pip --upgrade --user
-  - pip.exe install setuptools virtualenv --upgrade
-  - pip.exe install tox
+  - pip install virtualenv --upgrade
+  - pip install tox
 
 test_script:
   - tox.exe -e %TOX_ENV% -- --hypothesis-profile=ci --durations=20
