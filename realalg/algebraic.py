@@ -152,7 +152,7 @@ class RealAlgebraic(object):
         return self.__rtruediv__(other)
     def __rtruediv__(self, other):
         if isinstance(other, (Fraction, Integral)):
-            return RealAlgebraic.from_rational(self.field, other) / self
+            return self.field([other]) / self
         else:
             return NotImplemented
     def __mod__(self, other):
@@ -198,7 +198,7 @@ class RealAlgebraic(object):
             d = d * 2
     
     def __eq__(self, other):
-        return not (self - other)
+        return not self - other
     def __ne__(self, other):
         return not self == other
     def __gt__(self, other):
