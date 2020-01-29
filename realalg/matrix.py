@@ -1,13 +1,18 @@
 
+''' A module for getting algebraic numbers from matrix eigenvectors. '''
+
 from fractions import Fraction
 
 import cypari as cp
 import numpy as np
 
-import realalg
+from .algebraic import RealNumberField
 
 cp_x = cp.pari('x')
+
 def rational(x):
+    ''' Return the cypari rational as a Python rational. '''
+    
     return Fraction(int(x.numerator()), int(x.denominator()))
 
 def eigenvectors(matrix):
@@ -16,7 +21,6 @@ def eigenvectors(matrix):
     A pair is interesting if:
       - the eigenvalue is: real, greater than 1, has degree greater than 1 and has multiplicity 1.
       - all entries of the eigenvector are positive. '''
-    
     
     M = cp.pari.matrix(*matrix.shape, entries=matrix.flatten())  # pylint: disable=not-an-iterable
     
@@ -27,7 +31,7 @@ def eigenvectors(matrix):
         if degree == 1: continue
         
         try:
-            K = realalg.RealNumberField([int(polynomial.polcoeff(i)) for i in range(degree+1)])  # It must be real to be interesting.
+            K = RealNumberField([int(polynomial.polcoeff(i)) for i in range(degree+1)])  # It must be real to be interesting.
         except ValueError:  # No real roots.
             continue
         
@@ -48,6 +52,5 @@ def eigenvectors(matrix):
                 scale = scale.lcm(coefficient.denominator)
         scaled_eigenvector = eigenvector * int(scale)
         
-        yield eigenvalue, eigenvector
-    
-    return
+        yield eigenvalue, scaled_eigenvector
+
