@@ -1,8 +1,14 @@
 
-import cypari
+from fractions import Fraction
+
+import cypari as cp
 import numpy as np
 
 import realalg
+
+cp_x = cp.pari('x')
+def rational(x):
+    return Fraction(int(x.numerator()), int(x.denominator()))
 
 def eigenvectors(matrix):
     ''' Return the `interesting` (eigenvalue, eigenvector) pairs of a given matrix.
@@ -11,9 +17,8 @@ def eigenvectors(matrix):
       - the eigenvalue is: real, greater than 1, has degree greater than 1 and has multiplicity 1.
       - all entries of the eigenvector are positive. '''
     
-    x = cypari.pari('x')
     
-    M = cypari.pari.matrix(*matrix.shape, entries=matrix.flatten())  # pylint: disable=not-an-iterable
+    M = cp.pari.matrix(*matrix.shape, entries=matrix.flatten())  # pylint: disable=not-an-iterable
     
     for polynomial, multiplicity in zip(*M.charpoly().factor()):
         if multiplicity > 1: continue
@@ -29,11 +34,11 @@ def eigenvectors(matrix):
         if K.lmbda <= 1: continue
         
         # Compute the kernel:
-        a = x.Mod(polynomial)
+        a = cp_x.Mod(polynomial)
         kernel_basis = (M - a).matker()
         
         eigenvalue = K.lmbda
-        eigenvector = np.array([K([entry.lift().polcoeff(i) for i in range(degree)]) for entry in kernel_basis[0]], dtype=object)
+        eigenvector = np.array([K([rational(entry.lift().polcoeff(i)) for i in range(degree)]) for entry in kernel_basis[0]], dtype=object)
         assert np.array_equal(matrix.dot(eigenvector), eigenvalue * eigenvector)
         
         yield eigenvalue, eigenvector
