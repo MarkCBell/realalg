@@ -41,6 +41,13 @@ def eigenvectors(matrix):
         eigenvector = np.array([K([rational(entry.lift().polcoeff(i)) for i in range(degree)]) for entry in kernel_basis[0]], dtype=object)
         assert np.array_equal(matrix.dot(eigenvector), eigenvalue * eigenvector)
         
+        # Rescale to clear denominators for performance.
+        scale = cp.pari.one()
+        for entry in eigenvector:
+            for coefficient in entry.coefficients:
+                scale = scale.lcm(coefficient.denominator)
+        scaled_eigenvector = eigenvector * int(scale)
+        
         yield eigenvalue, eigenvector
     
     return
