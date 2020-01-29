@@ -16,7 +16,7 @@ def readme():
 
 setup(
     name='realalg',
-    version='0.1.3',
+    version='0.1.4',
     description='For manipulating real algebraic numbers',
     long_description=readme(),
     author='Mark Bell',
