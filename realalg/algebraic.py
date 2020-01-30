@@ -53,11 +53,13 @@ class RealNumberField(object):
     def __str__(self):
         return 'QQ[x] / <<{}>> embedding x |--> {}'.format(self.cp_polynomial, self.lmbda)
     def __repr__(self):
-        return 'RealNumberField({})'.format(self.coefficients)
+        return 'RealNumberField([{}])'.format(', '.join(str(coeff) for coeff in self.coefficients))
     def __call__(self, coefficients):
         return RealAlgebraic(self, cp_polynomial(coefficients).Mod(self.cp_polynomial))
     def __hash__(self):
         return hash(tuple(self.coefficients) + (self.index,))
+    def __reduce__(self):
+        return (self.__class__, (self.coefficients, self.index))
     
     def intervals(self, accuracy):
         ''' Return intervals around self.lmbda**i with at least the requested accuracy. '''
@@ -87,7 +89,9 @@ class RealAlgebraic(object):
     def __str__(self):
         return str(self.N())
     def __repr__(self):
-        return '{!r}({})'.format(self.field, self.coefficients)
+        return '{!r}([{}])'.format(self.field, ', '.join(str(coeff) for coeff in self.coefficients))
+    def __reduce__(self):
+        return (self.field, (self.coefficients,))
     def __bool__(self):
         return self.coefficients != [Fraction(0, 1)]
     def __nonzero__(self):  # For Python2.
