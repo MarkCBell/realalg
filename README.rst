@@ -18,9 +18,11 @@ RealAlg
     :target: https://coveralls.io/github/MarkCBell/realalg?branch=master
     :alt: Coveralls status
 
-Realalg provides real algebraic numbers (embedded into R).
+RealAlg provides real algebraic numbers (embedded into R).
+This is achieved through a variety of interfaces.
+For most performance ensure that cyPari or cyPari2 is installed, or run it within `Sage`_.
 
-It officially supports Python 2.7 and 3.5 -- 3.7.
+It officially supports Python 3.6 -- 3.8.
 It also runs on `PyPy`_ and `Sage`_.
 
 External Links
