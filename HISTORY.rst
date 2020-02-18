@@ -2,6 +2,18 @@
 History
 =======
 
+0.1.5 (2020-02-18)
+------------------
+
+* Created interfaces for cypari, cypari2 and sympy backends.
+
+0.1.4 (2020-01-29)
+------------------
+
+* Added method for getting matrix eigenvectors.
+* Rescaling eigenvector for performance.
+* Better sign testing.
+
 0.1.3 (2019-07-22)
 ------------------
 
