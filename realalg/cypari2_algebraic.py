@@ -1,15 +1,16 @@
 
-''' A module for representing and manipulating real algebraic numbers and the fields that they live in. '''
+''' A module for representing and manipulating real algebraic numbers and the fields that they live in using cypari2. '''
 
 from fractions import Fraction
-import sympy as sp
-import cypari2
-from .base_algebraic import BaseRealNumberField, BaseRealAlgebraic, log_plus
+import numpy as np
+import cypari2  # pylint: disable=import-error
+from .base_algebraic import BaseRealNumberField, BaseRealAlgebraic
 
 cp = cypari2.Pari()
 cp_x = cp('x')
 
 def cp_polynomial(coefficients):
+    ''' Return a cypari2 polynomial from its coefficients. '''
     return cp(' + '.join('{}*x^{}'.format(coefficient, index) for index, coefficient in enumerate(coefficients)))
 
 class RealNumberField(BaseRealNumberField):
@@ -27,20 +28,15 @@ class RealNumberField(BaseRealNumberField):
 class RealAlgebraic(BaseRealAlgebraic):
     ''' Represents an element of a number field. '''
     __engine = 'cypari2'
-    
-    def __init__(self, field, cp_mod):
-        self.field = field
-        self.cp_mod = cp_mod
-        self.cp_polynomial = self.cp_mod.lift()
-        length = self.cp_polynomial.poldegree()
-        self.coefficients = [Fraction(int(self.cp_polynomial.polcoeff(i).numerator()), int(self.cp_polynomial.polcoeff(i).denominator())) for i in range(length+1)]
-        if not self.coefficients:
-            self.coefficients = [Fraction(0, 1)]
-        self.length = sum(log_plus(coefficient.numerator) + log_plus(coefficient.denominator) + index * self.field.length for index, coefficient in enumerate(self.coefficients))
+    @staticmethod
+    def _extract(rep):
+        polynomial = rep.lift()
+        length = polynomial.poldegree()
+        return [Fraction(int(polynomial.polcoeff(i).numerator()), int(polynomial.polcoeff(i).denominator())) for i in range(length+1)]
     
     def minpoly(self):
         ''' Return the (cypari) minimum polynomial of this algebraic number. '''
-        return self.cp_mod.minpoly()
+        return self.rep.minpoly()
     def degree(self):
         ''' Return the degree of this algebraic number. '''
         return self.minpoly().poldegree()

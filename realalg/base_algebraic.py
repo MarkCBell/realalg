@@ -1,8 +1,12 @@
 
+''' A module for representing and manipulating real algebraic numbers and the fields that they live in. '''
+
+from abc import ABCMeta, abstractmethod
 from fractions import Fraction
 from functools import total_ordering
 from math import log10 as log
 from numbers import Integral
+import six
 import sympy as sp
 
 from .interval import Interval
@@ -35,6 +39,7 @@ class BaseRealNumberField(object):
         self._accuracy = 0
         self._intervals = None
         self._bound = max(len(str(abs(int(self.sp_place**i)))) for i in range(self.degree))
+        self.lmbda = None  # To be created by instances.
     
     def __str__(self):
         return 'QQ[x] / <<{}>> embedding x |--> {}'.format(sp.Poly(self.sp_polynomial.all_coeffs(), sp_x).as_expr(), self.lmbda)
@@ -60,12 +65,16 @@ class BaseRealNumberField(object):
 
 
 @total_ordering
+@six.add_metaclass(ABCMeta)
 class BaseRealAlgebraic(object):
     ''' Represents an element of a number field. '''
-    def __init__(self, field, cp_mod):
+    __engine = 'base'
+    _extract = lambda rep: [Fraction(coeff.numerator, coeff.denominator) for coeff in reversed(rep.data.all_coeffs())]
+    
+    def __init__(self, field, rep):
         self.field = field
-        self.cp_mod = cp_mod
-        self.coefficients = [Fraction(coeff.numerator, coeff.denominator) for coeff in reversed(self.cp_mod.data.all_coeffs())]
+        self.rep = rep
+        self.coefficients = self._extract(rep)
         if not self.coefficients:
             self.coefficients = [Fraction(0, 1)]
         self.length = sum(log_plus(coefficient.numerator) + log_plus(coefficient.denominator) + index * self.field.length for index, coefficient in enumerate(self.coefficients))
@@ -83,7 +92,7 @@ class BaseRealAlgebraic(object):
         return self
     def __add__(self, other):
         if isinstance(other, BaseRealAlgebraic):
-            return self.__class__(self.field, self.cp_mod + other.cp_mod)
+            return self.__class__(self.field, self.rep + other.rep)
         elif isinstance(other, (Fraction, Integral)):
             return self + self.field([other])
         elif isinstance(other, float):
@@ -97,12 +106,12 @@ class BaseRealAlgebraic(object):
     def __rsub__(self, other):
         return other + (-self)
     def __neg__(self):
-        return self.__class__(self.field, -self.cp_mod)
+        return self.__class__(self.field, -self.rep)
     def __abs__(self):
         return self if self > 0 else -self
     def __mul__(self, other):
         if isinstance(other, BaseRealAlgebraic):
-            return self.__class__(self.field, self.cp_mod * other.cp_mod)
+            return self.__class__(self.field, self.rep * other.rep)
         elif isinstance(other, (Fraction, Integral)):
             return self * self.field([other])
         elif isinstance(other, float):
@@ -128,7 +137,7 @@ class BaseRealAlgebraic(object):
         if other == 0:
             raise ZeroDivisionError('division by zero')
         if isinstance(other, BaseRealAlgebraic):
-            return self.__class__(self.field, self.cp_mod / other.cp_mod)
+            return self.__class__(self.field, self.rep / other.rep)
         elif isinstance(other, (Fraction, Integral)):
             return self / self.field([other])
         elif isinstance(other, float):
@@ -146,13 +155,14 @@ class BaseRealAlgebraic(object):
         return self - (self // other) * other
     def __pow__(self, other):
         if isinstance(other, Integral):
-            return self.__class__(self.field, self.cp_mod ** other)
+            return self.__class__(self.field, self.rep ** other)
         else:
             return NotImplemented
     
+    @abstractmethod
     def minpoly(self):
         ''' Return the minimum polynomial of this algebraic number. '''
-        return self.cp_mod.minpoly()
+    
     def degree(self):
         ''' Return the degree of this algebraic number. '''
         return self.minpoly().degree()
@@ -214,12 +224,4 @@ class BaseRealAlgebraic(object):
         return self < other or self == other
     def __hash__(self):
         return hash(tuple(self.coefficients))
-    
-    def minpoly(self):
-        ''' Return the minimum polynomial of this algebraic number. '''
-        return NotImplemented
-    
-    def degree(self):
-        ''' Return the degree of this algebraic number. '''
-        return self.minpoly().degree()
 

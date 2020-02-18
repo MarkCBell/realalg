@@ -1,19 +1,22 @@
 
-''' A module for representing and manipulating real algebraic numbers and the fields that they live in. '''
+''' A module for representing and manipulating real algebraic numbers and the fields that they live in using cypari. '''
 
 from fractions import Fraction
-import sympy as sp
-import cypari
-from .base_algebraic import BaseRealNumberField, BaseRealAlgebraic, log_plus
+import numpy as np
+import cypari  # pylint: disable=import-error
+from .base_algebraic import BaseRealNumberField, BaseRealAlgebraic
 
 cp = cypari.pari
 cp_x = cp('x')
 
 def cp_polynomial(coefficients):
+    ''' Return a cypari polynomial from its coefficients. '''
     return cp(' + '.join('{}*x^{}'.format(coefficient, index) for index, coefficient in enumerate(coefficients)))
 
 class RealNumberField(BaseRealNumberField):
     ''' Represents the NumberField QQ(lmbda) = QQ[x] / << f(x) >> where lmbda is a real root of f(x). '''
+    __engine = 'cypari'
+    
     def __init__(self, coefficients, index=-1):  # List of integers and / or Fractions, integer index
         super(RealNumberField, self).__init__(coefficients, index)
         self.cp_polynomial = cp_polynomial(self.coefficients)
@@ -24,19 +27,16 @@ class RealNumberField(BaseRealNumberField):
 
 class RealAlgebraic(BaseRealAlgebraic):
     ''' Represents an element of a number field. '''
-    def __init__(self, field, cp_mod):
-        self.field = field
-        self.cp_mod = cp_mod
-        self.cp_polynomial = self.cp_mod.lift()
-        length = self.cp_polynomial.poldegree()
-        self.coefficients = [Fraction(int(self.cp_polynomial.polcoeff(i).numerator()), int(self.cp_polynomial.polcoeff(i).denominator())) for i in range(length+1)]
-        if not self.coefficients:
-            self.coefficients = [Fraction(0, 1)]
-        self.length = sum(log_plus(coefficient.numerator) + log_plus(coefficient.denominator) + index * self.field.length for index, coefficient in enumerate(self.coefficients))
+    __engine = 'cypari'
+    @staticmethod
+    def _extract(rep):
+        polynomial = rep.lift()
+        length = polynomial.poldegree()
+        return [Fraction(int(polynomial.polcoeff(i).numerator()), int(polynomial.polcoeff(i).denominator())) for i in range(length+1)]
     
     def minpoly(self):
         ''' Return the (cypari) minimum polynomial of this algebraic number. '''
-        return self.cp_mod.minpoly()
+        return self.rep.minpoly()
     def degree(self):
         ''' Return the degree of this algebraic number. '''
         return self.minpoly().poldegree()

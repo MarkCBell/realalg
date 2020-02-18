@@ -1,9 +1,10 @@
 
-''' A module for representing and manipulating real algebraic numbers and the fields that they live in. '''
+''' A module for representing and manipulating real algebraic numbers and the fields that they live in using sympy. '''
 
 from fractions import Fraction
+import numpy as np
 import sympy as sp
-from .base_algebraic import BaseRealNumberField, BaseRealAlgebraic, log_plus
+from .base_algebraic import BaseRealNumberField, BaseRealAlgebraic
 
 sp_Fraction = sp.polys.domains.PythonRational
 sp_x = sp.Symbol('x')
@@ -21,17 +22,10 @@ class RealNumberField(BaseRealNumberField):
     def __call__(self, coefficients):
         return RealAlgebraic(self, self.sp_quotient_ring([sp_Fraction(coeff.numerator, coeff.denominator) for coeff in coefficients[::-1]]))
 
-class RealAlgebraic(BaseRealNumberField):
+class RealAlgebraic(BaseRealAlgebraic):
     ''' Represents an element of a number field. '''
     __engine = 'sympy'
-    
-    def __init__(self, field, cp_mod):
-        self.field = field
-        self.cp_mod = cp_mod
-        self.coefficients = [Fraction(coeff.numerator, coeff.denominator) for coeff in reversed(self.cp_mod.data.all_coeffs())]
-        if not self.coefficients:
-            self.coefficients = [Fraction(0, 1)]
-        self.length = sum(log_plus(coefficient.numerator) + log_plus(coefficient.denominator) + index * self.field.length for index, coefficient in enumerate(self.coefficients))
+    _extract = lambda rep: [Fraction(coeff.numerator, coeff.denominator) for coeff in reversed(rep.data.all_coeffs())]
     
     def minpoly(self):
         ''' Return the minimum polynomial of this algebraic number. '''
@@ -42,6 +36,11 @@ def rational(x):
     return Fraction(int(x))
 
 def eigenvectors(matrix):
+    ''' Return the `interesting` (eigenvalue, eigenvector) pairs of a given matrix.
+    
+     A pair is interesting if:
+       - the eigenvalue is: real, greater than 1, has degree greater than 1 and has multiplicity 1.
+       - all entries of the eigenvector are positive. '''
     
     width, height = matrix.shape
     assert width == height
