@@ -63,13 +63,14 @@ class BaseRealNumberField(object):
             self._accuracy = accuracy
         return [I.simplify(accuracy+1) for I in self._intervals]
 
-
 @total_ordering
 @six.add_metaclass(ABCMeta)
 class BaseRealAlgebraic(object):
     ''' Represents an element of a number field. '''
     __engine = 'base'
-    _extract = lambda rep: [Fraction(coeff.numerator, coeff.denominator) for coeff in reversed(rep.data.all_coeffs())]
+    @staticmethod
+    def _extract(rep):
+        return [Fraction(coeff.numerator, coeff.denominator) for coeff in reversed(rep.data.all_coeffs())]
     
     def __init__(self, field, rep):
         self.field = field

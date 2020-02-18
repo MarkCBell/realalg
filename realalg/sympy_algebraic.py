@@ -25,7 +25,9 @@ class RealNumberField(BaseRealNumberField):
 class RealAlgebraic(BaseRealAlgebraic):
     ''' Represents an element of a number field. '''
     __engine = 'sympy'
-    _extract = lambda rep: [Fraction(coeff.numerator, coeff.denominator) for coeff in reversed(rep.data.all_coeffs())]
+    @staticmethod
+    def _extract(rep):
+        return [Fraction(coeff.numerator, coeff.denominator) for coeff in reversed(rep.data.all_coeffs())]
     
     def minpoly(self):
         ''' Return the minimum polynomial of this algebraic number. '''
