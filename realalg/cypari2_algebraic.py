@@ -76,7 +76,7 @@ def eigenvectors(matrix):
         assert np.array_equal(matrix.dot(eigenvector), eigenvalue * eigenvector)
         
         # Rescale to clear denominators for performance.
-        scale = cp.pari.one()
+        scale = cp.one()
         for entry in eigenvector:
             for coefficient in entry.coefficients:
                 scale = scale.lcm(coefficient.denominator)
