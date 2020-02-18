@@ -1,65 +1,49 @@
 
-''' A module for representing and manipulating real algebraic numbers and the fields that they live in. '''
-
 from fractions import Fraction
 from functools import total_ordering
 from math import log10 as log
 from numbers import Integral
-
-import cypari as cp
 import sympy as sp
 
 from .interval import Interval
 
 sp_x = sp.Symbol('x')
-cp_x = cp.pari('x')
+sp_QQ_x = sp.QQ.old_poly_ring(sp_x)
 
 def log_plus(x):
     ''' Return the height of the number ``x``. '''
     return log(max(1, abs(x)))
 
-def sp_polynomial(coefficients):
-    ''' Return the sympy polynomial with the given coefficients. '''
-    return sp.Poly(coefficients[::-1], sp_x)
-
-def cp_polynomial(coefficients):
-    ''' Return the cypari polynomial with the given coefficients. '''
-    return cp.pari(' + '.join('{}*x^{}'.format(coefficient, index) for index, coefficient in enumerate(coefficients)))
-
-class RealNumberField(object):
+class BaseRealNumberField(object):
     ''' Represents the NumberField QQ(lmbda) = QQ[x] / << f(x) >> where lmbda is a real root of f(x). '''
-    def __init__(self, coefficients, index=-1):  # List of integers and / or Fractions, integer index
+    def __init__(self, coefficients, index=-1):  # List of integers and integer index
         if len(coefficients) < 3:
             raise ValueError('Degree of Polynomial must be at least two')
         if not coefficients[-1]:
             raise ValueError('Leading coefficient must be non-zero')
-        self.coefficients = [Fraction(coefficient) for coefficient in coefficients]
+        self.coefficients = coefficients  # List of integers.
         self.index = index
-        self.sp_polynomial = sp_polynomial(self.coefficients)
-        self.cp_polynomial = cp_polynomial(self.coefficients)
-        if not self.cp_polynomial.polisirreducible():
-            raise ValueError('Polynomial {} is reducible'.format(self.cp_polynomial))
-        self.degree = self.cp_polynomial.poldegree()
+        self.sp_polynomial = sp_QQ_x(self.coefficients[::-1])
+        if not self.sp_polynomial.is_irreducible:
+            raise ValueError('Polynomial {} is reducible'.format(self.sp_polynomial))
+        self.degree = self.sp_polynomial.degree()
         self.length = sum(log_plus(coefficient.numerator) + log_plus(coefficient.denominator) for coefficient in self.coefficients)
-        real_roots = self.sp_polynomial.real_roots()
+        real_roots = sp.Poly(self.coefficients[::-1], sp_x).real_roots()
         if not real_roots:
-            raise ValueError('Polynomial {} has no real roots'.format(self.cp_polynomial))
+            raise ValueError('Polynomial {} has no real roots'.format(self.sp_polynomial))
         self.sp_place = real_roots[index]
-        self.lmbda = self([0, 1])
         self._accuracy = 0
         self._intervals = None
         self._bound = max(len(str(abs(int(self.sp_place**i)))) for i in range(self.degree))
     
     def __str__(self):
-        return 'QQ[x] / <<{}>> embedding x |--> {}'.format(self.cp_polynomial, self.lmbda)
+        return 'QQ[x] / <<{}>> embedding x |--> {}'.format(sp.Poly(self.sp_polynomial.all_coeffs(), sp_x).as_expr(), self.lmbda)
     def __repr__(self):
-        return 'RealNumberField([{}])'.format(', '.join(str(coeff) for coeff in self.coefficients))
-    def __call__(self, coefficients):
-        return RealAlgebraic(self, cp_polynomial(coefficients).Mod(self.cp_polynomial))
+        return 'RealNumberField({})'.format(self.coefficients)
     def __hash__(self):
         return hash(tuple(self.coefficients) + (self.index,))
     def __reduce__(self):
-        return (self.__class__, (self.coefficients, self.index))
+        return (self.__class__, (self.coefficients,))
     
     def intervals(self, accuracy):
         ''' Return intervals around self.lmbda**i with at least the requested accuracy. '''
@@ -74,15 +58,14 @@ class RealNumberField(object):
             self._accuracy = accuracy
         return [I.simplify(accuracy+1) for I in self._intervals]
 
+
 @total_ordering
-class RealAlgebraic(object):
+class BaseRealAlgebraic(object):
     ''' Represents an element of a number field. '''
     def __init__(self, field, cp_mod):
         self.field = field
         self.cp_mod = cp_mod
-        self.cp_polynomial = self.cp_mod.lift()
-        self.len = self.cp_polynomial.poldegree()
-        self.coefficients = [Fraction(int(self.cp_polynomial.polcoeff(i).numerator()), int(self.cp_polynomial.polcoeff(i).denominator())) for i in range(self.len+1)]
+        self.coefficients = [Fraction(coeff.numerator, coeff.denominator) for coeff in reversed(self.cp_mod.data.all_coeffs())]
         if not self.coefficients:
             self.coefficients = [Fraction(0, 1)]
         self.length = sum(log_plus(coefficient.numerator) + log_plus(coefficient.denominator) + index * self.field.length for index, coefficient in enumerate(self.coefficients))
@@ -99,8 +82,8 @@ class RealAlgebraic(object):
     def __pos__(self):
         return self
     def __add__(self, other):
-        if isinstance(other, RealAlgebraic):
-            return RealAlgebraic(self.field, self.cp_mod + other.cp_mod)
+        if isinstance(other, BaseRealAlgebraic):
+            return self.__class__(self.field, self.cp_mod + other.cp_mod)
         elif isinstance(other, (Fraction, Integral)):
             return self + self.field([other])
         elif isinstance(other, float):
@@ -114,12 +97,12 @@ class RealAlgebraic(object):
     def __rsub__(self, other):
         return other + (-self)
     def __neg__(self):
-        return RealAlgebraic(self.field, -self.cp_mod)
+        return self.__class__(self.field, -self.cp_mod)
     def __abs__(self):
         return self if self > 0 else -self
     def __mul__(self, other):
-        if isinstance(other, RealAlgebraic):
-            return RealAlgebraic(self.field, self.cp_mod * other.cp_mod)
+        if isinstance(other, BaseRealAlgebraic):
+            return self.__class__(self.field, self.cp_mod * other.cp_mod)
         elif isinstance(other, (Fraction, Integral)):
             return self * self.field([other])
         elif isinstance(other, float):
@@ -144,8 +127,8 @@ class RealAlgebraic(object):
     def __truediv__(self, other):
         if other == 0:
             raise ZeroDivisionError('division by zero')
-        if isinstance(other, RealAlgebraic):
-            return RealAlgebraic(self.field, self.cp_mod / other.cp_mod)
+        if isinstance(other, BaseRealAlgebraic):
+            return self.__class__(self.field, self.cp_mod / other.cp_mod)
         elif isinstance(other, (Fraction, Integral)):
             return self / self.field([other])
         elif isinstance(other, float):
@@ -163,16 +146,16 @@ class RealAlgebraic(object):
         return self - (self // other) * other
     def __pow__(self, other):
         if isinstance(other, Integral):
-            return RealAlgebraic(self.field, self.cp_mod ** other)
+            return self.__class__(self.field, self.cp_mod ** other)
         else:
             return NotImplemented
     
     def minpoly(self):
-        ''' Return the (cypari) minimum polynomial of this algebraic number. '''
+        ''' Return the minimum polynomial of this algebraic number. '''
         return self.cp_mod.minpoly()
     def degree(self):
         ''' Return the degree of this algebraic number. '''
-        return self.minpoly().poldegree()
+        return self.minpoly().degree()
     
     def interval(self, accuracy=8):
         ''' Return an interval around self with at least the requested accuracy. '''
@@ -209,7 +192,7 @@ class RealAlgebraic(object):
         if isinstance(other, Integral):
             I = self.interval()
             if I.lower > other * 10**I.precision: return True
-        elif isinstance(other, RealAlgebraic):
+        elif isinstance(other, BaseRealAlgebraic):
             I = self.interval()
             J = other.interval()
             if I.lower * 10**J.precision > J.upper * 10**I.precision: return True
@@ -221,7 +204,7 @@ class RealAlgebraic(object):
         if isinstance(other, Integral):
             I = self.interval()
             if I.upper < other * 10**I.precision: return True
-        elif isinstance(other, RealAlgebraic):
+        elif isinstance(other, BaseRealAlgebraic):
             I = self.interval()
             J = other.interval()
             if I.upper * 10**J.precision < J.lower * 10**I.precision: return True
@@ -231,4 +214,12 @@ class RealAlgebraic(object):
         return self < other or self == other
     def __hash__(self):
         return hash(tuple(self.coefficients))
+    
+    def minpoly(self):
+        ''' Return the minimum polynomial of this algebraic number. '''
+        return NotImplemented
+    
+    def degree(self):
+        ''' Return the degree of this algebraic number. '''
+        return self.minpoly().degree()
 

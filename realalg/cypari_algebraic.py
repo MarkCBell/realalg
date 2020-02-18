@@ -1,0 +1,86 @@
+
+''' A module for representing and manipulating real algebraic numbers and the fields that they live in. '''
+
+from fractions import Fraction
+import sympy as sp
+import cypari
+from .base_algebraic import BaseRealNumberField, BaseRealAlgebraic, log_plus
+
+cp = cypari.pari
+cp_x = cp('x')
+
+def cp_polynomial(coefficients):
+    return cp(' + '.join('{}*x^{}'.format(coefficient, index) for index, coefficient in enumerate(coefficients)))
+
+class RealNumberField(BaseRealNumberField):
+    ''' Represents the NumberField QQ(lmbda) = QQ[x] / << f(x) >> where lmbda is a real root of f(x). '''
+    def __init__(self, coefficients, index=-1):  # List of integers and / or Fractions, integer index
+        super(RealNumberField, self).__init__(coefficients, index)
+        self.cp_polynomial = cp_polynomial(self.coefficients)
+        self.lmbda = self([0, 1])
+    
+    def __call__(self, coefficients):
+        return RealAlgebraic(self, cp_polynomial(coefficients).Mod(self.cp_polynomial))
+
+class RealAlgebraic(BaseRealAlgebraic):
+    ''' Represents an element of a number field. '''
+    def __init__(self, field, cp_mod):
+        self.field = field
+        self.cp_mod = cp_mod
+        self.cp_polynomial = self.cp_mod.lift()
+        length = self.cp_polynomial.poldegree()
+        self.coefficients = [Fraction(int(self.cp_polynomial.polcoeff(i).numerator()), int(self.cp_polynomial.polcoeff(i).denominator())) for i in range(length+1)]
+        if not self.coefficients:
+            self.coefficients = [Fraction(0, 1)]
+        self.length = sum(log_plus(coefficient.numerator) + log_plus(coefficient.denominator) + index * self.field.length for index, coefficient in enumerate(self.coefficients))
+    
+    def minpoly(self):
+        ''' Return the (cypari) minimum polynomial of this algebraic number. '''
+        return self.cp_mod.minpoly()
+    def degree(self):
+        ''' Return the degree of this algebraic number. '''
+        return self.minpoly().poldegree()
+
+def rational(x):
+    ''' Return the cypari rational as a Python rational. '''
+    return Fraction(int(x.numerator()), int(x.denominator()))
+
+def eigenvectors(matrix):
+    ''' Return the `interesting` (eigenvalue, eigenvector) pairs of a given matrix.
+    
+    A pair is interesting if:
+      - the eigenvalue is: real, greater than 1, has degree greater than 1 and has multiplicity 1.
+      - all entries of the eigenvector are positive. '''
+    
+    M = cp.matrix(*matrix.shape, entries=matrix.flatten())  # pylint: disable=not-an-iterable
+    
+    for polynomial, multiplicity in zip(*M.charpoly().factor()):
+        if multiplicity > 1: continue
+        
+        degree = int(polynomial.poldegree())
+        if degree == 1: continue
+        
+        try:
+            K = RealNumberField([int(polynomial.polcoeff(i)) for i in range(degree+1)])  # It must be real to be interesting.
+        except ValueError:  # No real roots.
+            continue
+        
+        if K.lmbda <= 1: continue
+        
+        # Compute the kernel:
+        a = cp_x.Mod(polynomial)
+        kernel_basis = (M - a).matker()
+        
+        eigenvalue = K.lmbda
+        eigenvector = np.array([K([rational(entry.lift().polcoeff(i)) for i in range(degree)]) for entry in kernel_basis[0]], dtype=object)
+        assert np.array_equal(matrix.dot(eigenvector), eigenvalue * eigenvector)
+        
+        # Rescale to clear denominators for performance.
+        scale = cp.pari.one()
+        for entry in eigenvector:
+            for coefficient in entry.coefficients:
+                scale = scale.lcm(coefficient.denominator)
+        scaled_eigenvector = eigenvector * int(scale)
+        
+        yield eigenvalue, scaled_eigenvector
+

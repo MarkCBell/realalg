@@ -23,7 +23,7 @@ def intervals(draw, precision=None):
     if precision is None: precision = draw(st.integers(min_value=1, max_value=100))
     lower = draw(st.integers())
     upper = draw(st.integers(min_value=lower))
-    return realalg.Interval(lower, upper, precision)
+    return realalg.interval.Interval(lower, upper, precision)
 
 @st.composite
 def realnumberfields(draw):
