@@ -33,7 +33,6 @@ External Links
 * `Travis`_
 * `AppVeyor`_
 * `Azure`_
-* `Coveralls`_
 
 .. _AppVeyor: https://ci.appveyor.com/project/MarkCBell/realalg
 .. _Azure: https://dev.azure.com/MarkCBell/realalg
@@ -42,7 +41,6 @@ External Links
 .. _ReadTheDocs: http://realalg.readthedocs.io
 .. _Sage: http://www.sagemath.org
 .. _Travis: https://travis-ci.com/MarkCBell/realalg
-.. _Coveralls: https://coveralls.io/github/MarkCBell/realalg
 .. _PyPy: https://pypy.org/
 .. _cypari: https://pypi.org/project/cypari
 .. _cypari2: https://pypi.org/project/cypari2
