@@ -32,7 +32,7 @@ class RealAlgebraic(BaseRealAlgebraic):
     def _extract(rep):
         polynomial = rep.lift()
         length = polynomial.poldegree()
-        return [Fraction(int(polynomial.polcoeff(i).numerator()), int(polynomial.polcoeff(i).denominator())) for i in range(length+1)]
+        return [Fraction(int(polynomial.polcoef(i).numerator()), int(polynomial.polcoef(i).denominator())) for i in range(length+1)]
     
     def minpoly(self):
         ''' Return the (cypari) minimum polynomial of this algebraic number. '''
@@ -61,7 +61,7 @@ def eigenvectors(matrix):
         if degree == 1: continue
         
         try:
-            K = RealNumberField([int(polynomial.polcoeff(i)) for i in range(degree+1)])  # It must be real to be interesting.
+            K = RealNumberField([int(polynomial.polcoef(i)) for i in range(degree+1)])  # It must be real to be interesting.
         except ValueError:  # No real roots.
             continue
         
@@ -72,7 +72,7 @@ def eigenvectors(matrix):
         kernel_basis = (M - a).matker()
         
         eigenvalue = K.lmbda
-        eigenvector = np.array([K([rational(entry.lift().polcoeff(i)) for i in range(degree)]) for entry in kernel_basis[0]], dtype=object)
+        eigenvector = np.array([K([rational(entry.lift().polcoef(i)) for i in range(degree)]) for entry in kernel_basis[0]], dtype=object)
         assert np.array_equal(matrix.dot(eigenvector), eigenvalue * eigenvector)
         
         # Rescale to clear denominators for performance.
