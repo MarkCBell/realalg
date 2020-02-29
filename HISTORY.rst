@@ -2,6 +2,11 @@
 History
 =======
 
+0.2.3 (2020-02-29)
+------------------
+
+* Switched from using polcoeff to polcoef in pari libraries.
+
 0.2.2 (2020-02-18)
 ------------------
 
