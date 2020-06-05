@@ -13,6 +13,7 @@ from .interval import Interval
 
 sp_x = sp.Symbol('x')
 sp_QQ_x = sp.QQ.old_poly_ring(sp_x)
+LOG_2 = log(2)
 
 def log_plus(x):
     ''' Return the height of the number ``x``. '''
@@ -31,7 +32,7 @@ class BaseRealNumberField(object):
         if not self.sp_polynomial.is_irreducible:
             raise ValueError('Polynomial {} is reducible'.format(self.sp_polynomial))
         self.degree = self.sp_polynomial.degree()
-        self.length = sum(log_plus(coefficient.numerator) + log_plus(coefficient.denominator) for coefficient in self.coefficients)
+        self.length = sum(LOG_2 + log_plus(coefficient.numerator) + log_plus(coefficient.denominator) for coefficient in self.coefficients)
         real_roots = sp.Poly(self.coefficients[::-1], sp_x).real_roots()
         if not real_roots:
             raise ValueError('Polynomial {} has no real roots'.format(self.sp_polynomial))
@@ -78,7 +79,7 @@ class BaseRealAlgebraic(object):
         self.coefficients = self._extract(rep)
         if not self.coefficients:
             self.coefficients = [Fraction(0, 1)]
-        self.length = sum(log_plus(coefficient.numerator) + log_plus(coefficient.denominator) + index * self.field.length for index, coefficient in enumerate(self.coefficients))
+        self.length = sum(LOG_2 + log_plus(coefficient.numerator) + log_plus(coefficient.denominator) + index * self.field.length for index, coefficient in enumerate(self.coefficients))
     def __str__(self):
         return str(self.N())
     def __repr__(self):
