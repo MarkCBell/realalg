@@ -171,8 +171,8 @@ class BaseRealAlgebraic(object):
     
     def interval(self, accuracy=8):
         ''' Return an interval around self with at least the requested accuracy. '''
-        precision = int(accuracy + self.length + 1) + 1  # Cheap ceil.
-        interval = sum(coeff * interval for coeff, interval in zip(self.coefficients, self.field.intervals(precision)))
+        intermediate_accuracy = int(accuracy + log(max(abs(coefficient) for coefficient in self.coefficients)) + len(self.coefficients)) + 1
+        interval = sum(coeff * interval for coeff, interval in zip(self.coefficients, self.field.intervals(intermediate_accuracy)))
         assert interval.accuracy >= accuracy
         return interval.simplify(accuracy+1)
     def N(self, accuracy=8):
