@@ -198,32 +198,10 @@ class BaseRealAlgebraic(object):
     
     def __eq__(self, other):
         return not self - other
-    def __ne__(self, other):
-        return not self == other
     def __gt__(self, other):
-        if isinstance(other, Integral):
-            I = self.interval()
-            if I.lower > other * 10**I.precision: return True
-        elif isinstance(other, BaseRealAlgebraic):
-            I = self.interval()
-            J = other.interval()
-            if I.lower * 10**J.precision > J.upper * 10**I.precision: return True
-        
         return (self - other).sign() == +1
-    def __ge__(self, other):
-        return self > other or self == other
     def __lt__(self, other):
-        if isinstance(other, Integral):
-            I = self.interval()
-            if I.upper < other * 10**I.precision: return True
-        elif isinstance(other, BaseRealAlgebraic):
-            I = self.interval()
-            J = other.interval()
-            if I.upper * 10**J.precision < J.lower * 10**I.precision: return True
-        
         return (self - other).sign() == -1
-    def __le__(self, other):
-        return self < other or self == other
     def __hash__(self):
         return hash(tuple(self.coefficients))
 
