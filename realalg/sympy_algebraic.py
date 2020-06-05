@@ -80,9 +80,14 @@ def eigenvectors(matrix):
         eigenvector = np.array([K([rational(null_vector[degree*i + j]) for j in range(degree)]) for i in range(width)], dtype=object)
         assert np.array_equal(matrix.dot(eigenvector), eigenvalue * eigenvector)
         
+        if all(entry <= 0 for entry in eigenvector):
+            eigenvector = -eigenvector
+        
+        if any(entry < 0 for entry in eigenvector): continue
+        
         # Rescale to clear denominators for performance.
         scale = sp.lcm_list([coeff.denominator for entry in eigenvector for coeff in entry.coefficients])
-        scaled_eigenvector = eigenvector * int(scale)
+        eigenvector = eigenvector * int(scale)
         
-        yield eigenvalue, scaled_eigenvector
+        yield eigenvalue, eigenvector
 

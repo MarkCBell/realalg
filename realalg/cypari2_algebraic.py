@@ -53,7 +53,7 @@ def eigenvectors(matrix):
     
     A pair is interesting if:
       - the eigenvalue is: real, greater than 1, has degree greater than 1 and has multiplicity 1.
-      - all entries of the eigenvector are positive. '''
+      - all entries of the eigenvector are non-negative. '''
     
     M = cp.matrix(*matrix.shape, entries=matrix.flatten())  # pylint: disable=not-an-iterable
     
@@ -78,12 +78,17 @@ def eigenvectors(matrix):
         eigenvector = np.array([K([rational(entry.lift().polcoef(i)) for i in range(degree)]) for entry in kernel_basis[0]], dtype=object)
         assert np.array_equal(matrix.dot(eigenvector), eigenvalue * eigenvector)
         
+        if all(entry <= 0 for entry in eigenvector):
+            eigenvector = -eigenvector
+        
+        if any(entry < 0 for entry in eigenvector): continue
+        
         # Rescale to clear denominators for performance.
         scale = cp.one()
         for entry in eigenvector:
             for coefficient in entry.coefficients:
                 scale = scale.lcm(coefficient.denominator)
-        scaled_eigenvector = eigenvector * int(scale)
+        eigenvector = eigenvector * int(scale)
         
-        yield eigenvalue, scaled_eigenvector
+        yield eigenvalue, eigenvector
 
