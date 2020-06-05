@@ -30,6 +30,9 @@ class RealAlgebraic(BaseRealAlgebraic):
     __engine = 'cypari'
     @staticmethod
     def _extract(rep):
+        if rep == 0:
+            return [Fraction(0, 1)]
+        
         polynomial = rep.lift()
         length = polynomial.poldegree()
         return [Fraction(int(polynomial.polcoef(i).numerator()), int(polynomial.polcoef(i).denominator())) for i in range(length+1)]
