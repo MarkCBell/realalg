@@ -2,6 +2,12 @@
 History
 =======
 
+0.3.0 (2020-06-05)
+------------------
+
+* Fixed accuracy bug found by JZung.
+* Using tighter intermediate accuracy resulting in increased performance.
+
 0.2.3 (2020-02-29)
 ------------------
 
