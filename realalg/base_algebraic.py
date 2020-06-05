@@ -33,13 +33,13 @@ class BaseRealNumberField(object):
             raise ValueError('Polynomial {} is reducible'.format(self.sp_polynomial))
         self.degree = self.sp_polynomial.degree()
         self.length = sum(LOG_2 + log_plus(coefficient.numerator) + log_plus(coefficient.denominator) for coefficient in self.coefficients)
+        self.log_bound = log(sum(abs(coefficient) for coefficient in self.coefficients))  # log(self.sp_place) must be less than this.
         real_roots = sp.Poly(self.coefficients[::-1], sp_x).real_roots()
         if not real_roots:
             raise ValueError('Polynomial {} has no real roots'.format(self.sp_polynomial))
         self.sp_place = real_roots[index]
         self._accuracy = 0
         self._intervals = None
-        self._bound = max(len(str(abs(int(self.sp_place**i)))) for i in range(self.degree))
         self.lmbda = None  # To be created by instances.
     
     def __str__(self):
@@ -56,7 +56,7 @@ class BaseRealNumberField(object):
         assert isinstance(accuracy, Integral)
         assert accuracy > 0
         if accuracy > self._accuracy:
-            precision = int(accuracy + self.degree*self._bound + 1) + 1  # Cheap ceil.
+            precision = int(accuracy + self.degree*self.log_bound + 1) + 1  # Cheap ceil.
             s = str(sp.N(self.sp_place, precision))
             interval = Interval.from_string(s, precision)
             self._intervals = [interval**i for i in range(self.degree)]
