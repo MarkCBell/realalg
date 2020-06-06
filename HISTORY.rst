@@ -2,6 +2,11 @@
 History
 =======
 
+0.3.1 (2020-06-07)
+------------------
+
+* Fixed bug where eigenvectors were not checked that they are non-negative.
+
 0.3.0 (2020-06-05)
 ------------------
 
