@@ -4,7 +4,7 @@
 from fractions import Fraction
 from numbers import Integral
 
-class Interval(object):
+class Interval:
     ''' This represents a closed interval [lower / 10**precision, upper / 10**precision]. '''
     def __init__(self, lower, upper, precision):
         assert isinstance(lower, Integral)
@@ -63,8 +63,6 @@ class Interval(object):
             return NotImplemented
         
         return self.lower == other.lower and self.upper == other.upper and self.precision == other.precision
-    def __ne__(self, other):
-        return not self == other
     
     def __add__(self, other):
         if isinstance(other, Interval):

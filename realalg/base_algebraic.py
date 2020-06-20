@@ -1,12 +1,11 @@
 
 ''' A module for representing and manipulating real algebraic numbers and the fields that they live in. '''
 
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from fractions import Fraction
 from functools import total_ordering
 from math import log10 as log
 from numbers import Integral
-import six
 import sympy as sp
 
 from .interval import Interval
@@ -19,7 +18,7 @@ def log_plus(x):
     ''' Return the height of the number ``x``. '''
     return log(max(1, abs(x)))
 
-class BaseRealNumberField(object):
+class BaseRealNumberField:
     ''' Represents the NumberField QQ(lmbda) = QQ[x] / << f(x) >> where lmbda is a real root of f(x). '''
     def __init__(self, coefficients, index=-1):  # List of integers and integer index
         if len(coefficients) < 3:
@@ -65,8 +64,7 @@ class BaseRealNumberField(object):
         return [I.simplify(accuracy+1) for I in self._intervals]
 
 @total_ordering
-@six.add_metaclass(ABCMeta)
-class BaseRealAlgebraic(object):
+class BaseRealAlgebraic(ABC):
     ''' Represents an element of a number field. '''
     __engine = 'base'
     @staticmethod
