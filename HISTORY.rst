@@ -2,6 +2,12 @@
 History
 =======
 
+0.3.2 (2020-07-17)
+------------------
+
+* Removed Python 2 support.
+* Added minimum Python dependency version.
+
 0.3.1 (2020-06-07)
 ------------------
 
