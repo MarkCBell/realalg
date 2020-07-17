@@ -50,6 +50,9 @@ class Interval:
     def from_fraction(cls, fraction, precision):
         ''' A short way of constructing Intervals from a fraction. '''
         
+        if fraction.denominator == 1:
+            return Interval.from_integer(fraction.numerator, precision)
+        
         return cls((fraction.numerator*10**precision - 1) // fraction.denominator, (fraction.numerator*10**precision + 1) // fraction.denominator, precision)
     
     def __repr__(self):
