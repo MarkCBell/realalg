@@ -2,7 +2,7 @@
 ''' A module for representing and manipulating intervals. '''
 
 from fractions import Fraction
-from numbers import Integral
+from numbers import Integral, Rational
 
 class Interval:
     ''' This represents a closed interval [lower / 10**precision, upper / 10**precision]. '''
@@ -41,19 +41,10 @@ class Interval:
         return cls(lower, upper, precision)
     
     @classmethod
-    def from_integer(cls, integer, precision):
-        ''' A short way of constructing Intervals from a fraction. '''
+    def from_rational(cls, rational, precision):
+        ''' A short way of constructing Intervals from a rational. '''
         
-        return cls(integer*10**precision, integer*10**precision, precision)
-    
-    @classmethod
-    def from_fraction(cls, fraction, precision):
-        ''' A short way of constructing Intervals from a fraction. '''
-        
-        if fraction.denominator == 1:
-            return Interval.from_integer(fraction.numerator, precision)
-        
-        return cls((fraction.numerator*10**precision - 1) // fraction.denominator, (fraction.numerator*10**precision + 1) // fraction.denominator, precision)
+        return cls(rational.numerator * 10**precision // rational.denominator, -(-rational.numerator * 10**precision // rational.denominator), precision)
     
     def __repr__(self):
         return str(self)
@@ -75,10 +66,8 @@ class Interval:
                 self.upper + other.upper
                 ]
             return Interval(min(values), max(values), self.precision)
-        elif isinstance(other, Integral):
-            return self + Interval.from_integer(other, self.precision)
-        elif isinstance(other, Fraction):
-            return self + Interval.from_fraction(other, self.precision)
+        elif isinstance(other, Rational):
+            return self + Interval.from_rational(other, self.precision)
         else:
             return NotImplemented
     def __radd__(self, other):
@@ -106,7 +95,7 @@ class Interval:
     def __rmul__(self, other):
         return self * other
     def __pow__(self, power):
-        I = Interval.from_integer(1, self.precision)
+        I = Interval.from_rational(1, self.precision)
         powered = self
         while power:
             if power & 1: I *= powered
