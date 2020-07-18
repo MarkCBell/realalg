@@ -1,7 +1,6 @@
 
 ''' A module for representing and manipulating intervals. '''
 
-from fractions import Fraction
 from numbers import Integral, Rational
 
 class Interval:
