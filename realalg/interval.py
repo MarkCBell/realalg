@@ -86,10 +86,19 @@ class Interval:
                 self.upper * other.upper // 10**self.precision
                 ]
             return Interval(min(values), max(values), self.precision)
-        elif isinstance(other, Integral):
-            return self * Interval.from_integer(other, self.precision)
-        elif isinstance(other, Fraction):
-            return self * Interval.from_fraction(other, self.precision)
+        elif isinstance(other, Rational):
+            if other >= 0:
+                return Interval(
+                    self.lower * other.numerator // other.denominator,
+                    -(-self.upper * other.numerator // other.denominator),
+                    self.precision
+                    )
+            else:  # other < 0:
+                return Interval(
+                    self.upper * other.numerator // other.denominator,
+                    -(-self.lower * other.numerator // other.denominator),
+                    self.precision
+                    )
         else:
             return NotImplemented
     def __rmul__(self, other):
