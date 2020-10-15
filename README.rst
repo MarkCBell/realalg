@@ -22,7 +22,7 @@ RealAlg provides real algebraic numbers (embedded into R).
 This is achieved through a variety of interfaces.
 For most performance ensure that `cypari`_ or `cypari2`_ is installed, or run it within `Sage`_.
 
-It officially supports Python 3.6 -- 3.8.
+It officially supports Python 3.6 -- 3.9.
 It also runs on `PyPy`_ and `Sage`_.
 
 External Links
