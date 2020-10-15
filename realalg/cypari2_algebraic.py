@@ -18,7 +18,7 @@ class RealNumberField(BaseRealNumberField):
     __engine = 'cypari2'
     
     def __init__(self, coefficients, index=-1):  # List of integers and / or Fractions, integer index
-        super(RealNumberField, self).__init__(coefficients, index)
+        super().__init__(coefficients, index)
         self.cp_polynomial = cp_polynomial(self.coefficients)
         self.lmbda = self([0, 1])
     

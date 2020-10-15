@@ -15,7 +15,7 @@ class RealNumberField(BaseRealNumberField):
     __engine = 'sympy'
     
     def __init__(self, coefficients, index=-1):  # List of integers and integer index
-        super(RealNumberField, self).__init__(coefficients, index)
+        super().__init__(coefficients, index)
         self.sp_quotient_ring = sp_QQ_x.quotient_ring([self.sp_polynomial])
         self.lmbda = self([0, 1])
     
