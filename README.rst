@@ -10,13 +10,9 @@ RealAlg
     :target: https://pypi.org/project/realalg/
     :alt: PyPI license
 
-.. image:: https://api.travis-ci.org/MarkCBell/realalg.svg?branch=master
-    :target: https://travis-ci.com/MarkCBell/realalg/
-    :alt: Travis build status
-
-.. image:: https://img.shields.io/coveralls/github/MarkCBell/realalg.svg?branch=master
-    :target: https://coveralls.io/github/MarkCBell/realalg?branch=master
-    :alt: Coveralls status
+.. image:: https://img.shields.io/github/workflow/status/MarkCBell/realalg/Build/master
+    :target: https://github.com/MarkCBell/realalg/actions
+    :alt: Github build status
 
 RealAlg provides real algebraic numbers (embedded into R).
 This is achieved through a variety of interfaces.
@@ -30,7 +26,6 @@ External Links
 
 * `PyPI`_
 * `GitHub`_
-* `Travis`_
 * `AppVeyor`_
 * `Azure`_
 
@@ -40,7 +35,6 @@ External Links
 .. _PyPI: https://pypi.org/project/realalg
 .. _ReadTheDocs: http://realalg.readthedocs.io
 .. _Sage: http://www.sagemath.org
-.. _Travis: https://travis-ci.com/MarkCBell/realalg
 .. _PyPy: https://pypy.org/
 .. _cypari: https://pypi.org/project/cypari
 .. _cypari2: https://pypi.org/project/cypari2
