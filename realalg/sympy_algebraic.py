@@ -34,6 +34,10 @@ class RealAlgebraic(BaseRealAlgebraic):
         ''' Return the minimum polynomial of this algebraic number. '''
         return NotImplemented
 
+def rational(x):
+    ''' Return the sympy rational as a Python rational. '''
+    return Fraction(x.numerator(), x.denominator())
+
 def eigenvectors(matrix):
     ''' Return the `interesting` (eigenvalue, eigenvector) pairs of a given matrix.
     
@@ -74,7 +78,7 @@ def eigenvectors(matrix):
         null_vector = kernel[0]
         
         eigenvalue = K.lmbda
-        eigenvector = np.array([K([Fraction(null_vector[degree*i + j]) for j in range(degree)]) for i in range(width)], dtype=object)
+        eigenvector = np.array([K([rational(null_vector[degree*i + j]) for j in range(degree)]) for i in range(width)], dtype=object)
         assert np.array_equal(matrix.dot(eigenvector), eigenvalue * eigenvector)
         
         if all(entry <= 0 for entry in eigenvector):
