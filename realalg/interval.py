@@ -22,7 +22,7 @@ class Interval:
         ''' A short way of constructing Intervals from a string. '''
         
         if '.' not in string:
-            raise ValueError('invalid specification of interval: {}'.format(string))
+            raise ValueError(f'invalid specification of interval: {string}')
         if 'e' in string:
             d, _, p = string.partition('e')
             p = int(p)
@@ -50,7 +50,7 @@ class Interval:
     def __str__(self):
         p = self.precision
         l, u = str(self.lower).zfill(p + (1 if self.lower >= 0 else 2)), str(self.upper).zfill(p + (1 if self.lower >= 0 else 2))
-        return '[{}.{}, {}.{}]'.format(l[:-p], l[-p:], u[:-p], u[-p:])
+        return f'[{l[:-p]}.{l[-p:]}, {u[:-p]}.{u[-p:]}]'
     def __eq__(self, other):
         if not isinstance(other, Interval):
             return NotImplemented
@@ -118,7 +118,7 @@ class Interval:
         ''' Return a string describing the midpoint of this interval. '''
         m = (self.lower + self.upper) // 2
         ms = str(m).zfill(self.precision + (1 if m >= 0 else 2))  # Amount of padding depends upon sign.
-        return '{}.{}'.format(ms[:-self.precision], ms[-self.precision:])
+        return f'{ms[:-self.precision]}.{ms[-self.precision:]}'
     
     def simplify(self, new_precision):
         ''' Return a larger interval containing this of the given precision. '''

@@ -11,11 +11,11 @@ cp_x = cp('x')
 
 def cp_polynomial(coefficients):
     ''' Return a cypari polynomial from its coefficients. '''
-    return cp(' + '.join('{}*x^{}'.format(coefficient, index) for index, coefficient in enumerate(coefficients)))
+    return cp(' + '.join('{}*x^{}'.format(coefficient, index) for index, coefficient in enumerate(coefficients)))  # pylint: disable=consider-using-f-string
 
 class RealNumberField(BaseRealNumberField):
     ''' Represents the NumberField QQ(lmbda) = QQ[x] / << f(x) >> where lmbda is a real root of f(x). '''
-    __engine = 'cypari'
+    __engine = 'cypari'  # pylint: disable=unused-private-member
     
     def __init__(self, coefficients, index=-1):  # List of integers and / or Fractions, integer index
         super().__init__(coefficients, index)
@@ -27,7 +27,8 @@ class RealNumberField(BaseRealNumberField):
 
 class RealAlgebraic(BaseRealAlgebraic):
     ''' Represents an element of a number field. '''
-    __engine = 'cypari'
+    __engine = 'cypari'  # pylint: disable=unused-private-member
+    
     @staticmethod
     def _extract(rep):
         if rep == 0:
@@ -55,7 +56,7 @@ def eigenvectors(matrix):
       - the eigenvalue is: real, greater than 1, has degree greater than 1 and has multiplicity 1.
       - all entries of the eigenvector are non-negative. '''
     
-    M = cp.matrix(*matrix.shape, entries=matrix.flatten())  # pylint: disable=not-an-iterable
+    M = cp.matrix(*matrix.shape, entries=matrix.flatten())
     
     for polynomial, multiplicity in zip(*M.charpoly().factor()):
         if multiplicity > 1: continue
@@ -71,8 +72,13 @@ def eigenvectors(matrix):
         if K.lmbda <= 1: continue
         
         # Compute the kernel:
-        a = cp_x.Mod(polynomial)
-        kernel_basis = (M - a).matker()
+        while True:
+            try:
+                a = cp_x.Mod(polynomial)
+                kernel_basis = (M - a).matker()
+                break
+            except cypari._pari.PariError:
+                cp.allocatemem()
         
         eigenvalue = K.lmbda
         eigenvector = np.array([K([rational(entry.lift().polcoef(i)) for i in range(degree)]) for entry in kernel_basis[0]], dtype=object)

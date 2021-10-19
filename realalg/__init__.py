@@ -10,7 +10,7 @@ __version__ = pkg_resources.get_distribution('realalg').version
 INTERFACES = ['cypari', 'cypari2', 'sympy']
 for interface in INTERFACES:
     try:
-        module = import_module('realalg.{}_algebraic'.format(interface))
+        module = import_module(f'realalg.{interface}_algebraic')
         RealNumberField = module.RealNumberField
         RealAlgebraic = module.RealAlgebraic
         eigenvectors = module.eigenvectors

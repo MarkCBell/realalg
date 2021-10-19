@@ -20,6 +20,7 @@ def log_plus(x):
 
 class BaseRealNumberField:
     ''' Represents the NumberField QQ(lmbda) = QQ[x] / << f(x) >> where lmbda is a real root of f(x). '''
+    
     def __init__(self, coefficients, index=-1):  # List of integers and integer index
         if len(coefficients) < 3:
             raise ValueError('Degree of Polynomial must be at least two')
@@ -29,22 +30,22 @@ class BaseRealNumberField:
         self.index = index
         self.sp_polynomial = sp_QQ_x(self.coefficients[::-1])
         if not self.sp_polynomial.is_irreducible:
-            raise ValueError('Polynomial {} is reducible'.format(self.sp_polynomial))
+            raise ValueError(f'Polynomial {self.sp_polynomial} is reducible')
         self.degree = self.sp_polynomial.degree()
         self.length = sum(LOG_2 + log_plus(coefficient.numerator) + log_plus(coefficient.denominator) for coefficient in self.coefficients)
         self.log_bound = log(sum(abs(coefficient) for coefficient in self.coefficients))  # log(self.sp_place) must be less than this.
         real_roots = sp.Poly(self.coefficients[::-1], sp_x).real_roots()
         if not real_roots:
-            raise ValueError('Polynomial {} has no real roots'.format(self.sp_polynomial))
+            raise ValueError(f'Polynomial {self.sp_polynomial} has no real roots')
         self.sp_place = real_roots[index]
         self._accuracy = 0
         self._intervals = None
         self.lmbda = None  # To be created by instances.
     
     def __str__(self):
-        return 'QQ[x] / <<{}>> embedding x |--> {}'.format(sp.Poly(self.sp_polynomial.all_coeffs(), sp_x).as_expr(), self.lmbda)
+        return f'QQ[x] / <<{sp.Poly(self.sp_polynomial.all_coeffs(), sp_x).as_expr()}>> embedding x |--> {self.lmbda}'
     def __repr__(self):
-        return 'RealNumberField({})'.format(self.coefficients)
+        return f'RealNumberField({self.coefficients}, {self.index})'
     def __hash__(self):
         return hash(tuple(self.coefficients) + (self.index,))
     def __reduce__(self):
@@ -66,7 +67,7 @@ class BaseRealNumberField:
 @total_ordering
 class BaseRealAlgebraic(ABC):
     ''' Represents an element of a number field. '''
-    __engine = 'base'
+    
     @staticmethod
     def _extract(rep):
         return [Fraction(coeff.numerator, coeff.denominator) for coeff in reversed(rep.data.all_coeffs())]
@@ -81,7 +82,7 @@ class BaseRealAlgebraic(ABC):
     def __str__(self):
         return str(self.N())
     def __repr__(self):
-        return '{!r}([{}])'.format(self.field, ', '.join(str(coeff) for coeff in self.coefficients))
+        return '{!r}([{}])'.format(self.field, ', '.join(str(coeff) for coeff in self.coefficients))  # pylint: disable=consider-using-f-string
     def __reduce__(self):
         return (self.field, (self.coefficients,))
     def __bool__(self):
