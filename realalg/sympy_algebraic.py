@@ -36,7 +36,7 @@ class RealAlgebraic(BaseRealAlgebraic):
 
 def rational(x):
     ''' Return the sympy rational as a Python rational. '''
-    return Fraction(x.numerator(), x.denominator())
+    return Fraction(x.p, x.q)
 
 def eigenvectors(matrix):
     ''' Return the `interesting` (eigenvalue, eigenvector) pairs of a given matrix.

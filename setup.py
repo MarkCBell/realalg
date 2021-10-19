@@ -7,7 +7,7 @@ from setuptools import setup, find_packages
 
 requirements = [
     'numpy>=1.15.1',
-    'sympy>=1.9',
+    'sympy>=1.6',
 ]
 
 def readme():
