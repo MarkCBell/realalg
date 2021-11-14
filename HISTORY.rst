@@ -2,6 +2,13 @@
 History
 =======
 
+0.3.4 (2021-11-14)
+------------------
+
+* Update for new SymPy rational syntax.
+* Iteratively tries allocating more memory for CyPari.
+* Now using GitHub Actions for CI/CD.
+
 0.3.3 (2020-07-18)
 ------------------
 
