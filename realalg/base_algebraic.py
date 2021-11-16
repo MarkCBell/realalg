@@ -50,6 +50,8 @@ class BaseRealNumberField:
         return hash(tuple(self.coefficients) + (self.index,))
     def __reduce__(self):
         return (self.__class__, (self.coefficients,))
+    def __eq__(self, other):
+        return self.coefficients == other.coefficients and self.index == other.index
     
     def intervals(self, accuracy):
         ''' Return intervals around self.lmbda**i with at least the requested accuracy. '''
@@ -87,12 +89,12 @@ class BaseRealAlgebraic(ABC):
         return (self.field, (self.coefficients,))
     def __bool__(self):
         return self.coefficients != [Fraction(0, 1)]
-    def __nonzero__(self):  # For Python2.
-        return self.__bool__()
     def __pos__(self):
         return self
     def __add__(self, other):
         if isinstance(other, BaseRealAlgebraic):
+            if self.field != other.field:
+                return NotImplemented
             return self.__class__(self.field, self.rep + other.rep)
         elif isinstance(other, (Fraction, Integral)):
             return self + self.field([other])
@@ -195,12 +197,33 @@ class BaseRealAlgebraic(ABC):
                 raise RuntimeError('Should be zero')  # self == 0.
             d = d * 2
     
+    def cmp(self, other):
+        ''' Return the sign of self - other.
+        
+         This is done without computing self - other, so it works even across different number fields. '''
+        
+        if isinstance(other, (Fraction, Integral)):
+            other = self.field([other])
+        
+        d = 1
+        length = self.length + other.length + LOG_2  # An upper bound on the length of self - other.
+        while True:
+            potential_sign = (self.interval(accuracy=d) - other.interval(accuracy=d)).sign()
+            if potential_sign:  # sign is 'obvious' at this point.
+                return potential_sign
+            if d > length:
+                return 0
+            d = d * 2
+    
     def __eq__(self, other):
-        return not self - other
+        if self.field == other.field:
+            return not self - other
+        
+        return self.cmp(other) == 0
     def __gt__(self, other):
-        return (self - other).sign() == +1
+        return self.cmp(other) == +1
     def __lt__(self, other):
-        return (self - other).sign() == -1
+        return self.cmp(other) == -1
     def __hash__(self):
         return hash(tuple(self.coefficients))
 

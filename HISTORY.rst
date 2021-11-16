@@ -2,6 +2,11 @@
 History
 =======
 
+0.3.5 (2021-XX-YY)
+------------------
+
+* Can now compare algebraic number in different fields.
+
 0.3.4 (2021-11-14)
 ------------------
 
