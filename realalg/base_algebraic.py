@@ -216,7 +216,7 @@ class BaseRealAlgebraic(ABC):
             d = d * 2
     
     def __eq__(self, other):
-        if self.field == other.field:
+        if isinstance(other, (Fraction, Integral)) or isinstance(other, BaseRealAlgebraic) and self.field == other.field:
             return not self - other
         
         return self.cmp(other) == 0
