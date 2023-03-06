@@ -2,8 +2,14 @@
 ''' A package for manipulating real algebraic numbers. '''
 
 from importlib import import_module
-import pkg_resources
-__version__ = pkg_resources.get_distribution('realalg').version
+
+try:
+    # importlib.metadata is not available in Python < 3.8.
+    from importlib.metadata import version
+    __version__ = version('realalg')
+except ModuleNotFoundError:
+    import pkg_resources
+    __version__ = pkg_resources.get_distribution('realalg').version
 
 # from .algebraic import RealNumberField, RealAlgebraic  # noqa: F401
 
