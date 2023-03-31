@@ -12,7 +12,7 @@ sp_QQ_x = sp.QQ.old_poly_ring(sp_x)
 
 class RealNumberField(BaseRealNumberField):
     ''' Represents the NumberField QQ(lmbda) = QQ[x] / << f(x) >> where lmbda is a real root of f(x). '''
-    __engine = 'sympy'  # pylint: disable=unused-private-member
+    __engine = 'sympy'
     
     def __init__(self, coefficients, index=-1):  # List of integers and integer index
         super().__init__(coefficients, index)
@@ -24,7 +24,7 @@ class RealNumberField(BaseRealNumberField):
 
 class RealAlgebraic(BaseRealAlgebraic):
     ''' Represents an element of a number field. '''
-    __engine = 'sympy'  # pylint: disable=unused-private-member
+    __engine = 'sympy'
     
     @staticmethod
     def _extract(rep):

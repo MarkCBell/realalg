@@ -15,7 +15,7 @@ def cp_polynomial(coefficients):
 
 class RealNumberField(BaseRealNumberField):
     ''' Represents the NumberField QQ(lmbda) = QQ[x] / << f(x) >> where lmbda is a real root of f(x). '''
-    __engine = 'cypari2'  # pylint: disable=unused-private-member
+    __engine = 'cypari2'
     
     def __init__(self, coefficients, index=-1):  # List of integers and / or Fractions, integer index
         super().__init__(coefficients, index)
@@ -27,7 +27,7 @@ class RealNumberField(BaseRealNumberField):
 
 class RealAlgebraic(BaseRealAlgebraic):
     ''' Represents an element of a number field. '''
-    __engine = 'cypari2'  # pylint: disable=unused-private-member
+    __engine = 'cypari2'
     
     @staticmethod
     def _extract(rep):
