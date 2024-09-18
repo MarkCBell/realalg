@@ -60,6 +60,7 @@ jobs:
         python-version: "3.12"
     - name: Build
       run: |
+        pip install setuptools
         python setup.py sdist
     - name: Publish
       uses: pypa/gh-action-pypi-publish@release/v1
