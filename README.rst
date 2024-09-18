@@ -10,7 +10,7 @@ RealAlg
     :target: https://pypi.org/project/realalg/
     :alt: PyPI license
 
-.. image:: https://img.shields.io/github/workflow/status/MarkCBell/realalg/Build/master
+.. image:: https://img.shields.io/github/check-runs/MarkCBell/realalg/master
     :target: https://github.com/MarkCBell/realalg/actions
     :alt: Github build status
 
