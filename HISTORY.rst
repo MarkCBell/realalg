@@ -2,9 +2,10 @@
 History
 =======
 
-0.3.5 (2021-XX-YY)
+0.3.5 (2024-09-18)
 ------------------
 
+* Python 3.8 -- 3.12 supported.
 * Can now compare algebraic number in different fields.
 
 0.3.4 (2021-11-14)
