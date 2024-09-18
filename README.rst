@@ -26,11 +26,7 @@ External Links
 
 * `PyPI`_
 * `GitHub`_
-* `AppVeyor`_
-* `Azure`_
 
-.. _AppVeyor: https://ci.appveyor.com/project/MarkCBell/realalg
-.. _Azure: https://dev.azure.com/MarkCBell/realalg
 .. _GitHub: https://github.com/MarkCBell/realalg
 .. _PyPI: https://pypi.org/project/realalg
 .. _ReadTheDocs: http://realalg.readthedocs.io
