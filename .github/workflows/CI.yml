@@ -28,10 +28,11 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Add clang path to $PATH env
-      shell: bash
+    - name: Set up Cygwin
+      uses: egor-tensin/setup-cygwin@v4
       if: runner.os == 'Windows'
-      run: echo "PATH=$PATH:C:\msys64\mingw64\bin" >> $GITHUB_ENV
+      with:
+        packages: gcc-core gcc-g++ python3${{ matrix.python-version }}-devel ninja pkgconf
     - name: Display Python version
       run: |
         python -c "import sys; print(sys.version)"
