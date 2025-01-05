@@ -17,7 +17,7 @@ RealAlg
 RealAlg provides real algebraic numbers (embedded into R).
 It does this by wrapping the `cypari2`_ library via `passagemath-pari`.
 
-It officially supports Python 3.9 -- 3.13.
+It officially supports Python 3.9 -- 3.12.
 It also runs on `PyPy`_ and `Sage`_.
 
 External Links
