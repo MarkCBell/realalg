@@ -38,5 +38,10 @@ setup(
         'Programming Language :: Python',
         'Topic :: Scientific/Engineering :: Mathematics',
         ],
+    extras_require={
+        'cypari':      ['cypari'],
+        'cypari2':     ['cypari2'],
+        'passagemath': ['passagemath-pari'],
+    }
 )
 
