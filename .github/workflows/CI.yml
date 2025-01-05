@@ -11,9 +11,7 @@ jobs:
         tox: [lint, py38, py39, py310, py311, py312]
         include:
         - tox: lint
-          python-version: "3.8"
-        - tox: py38
-          python-version: "3.8"
+          python-version: "3.9"
         - tox: py39
           python-version: "3.9"
         - tox: py310
@@ -22,6 +20,8 @@ jobs:
           python-version: "3.11"
         - tox: py312
           python-version: "3.12"
+        - tox: py313
+          python-version: "3.13"
     runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout branch
