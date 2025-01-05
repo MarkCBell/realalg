@@ -3,7 +3,7 @@
 
 from fractions import Fraction
 import numpy as np
-import cypari2  # pylint: disable=import-error
+import cypari2
 from .base_algebraic import BaseRealNumberField, BaseRealAlgebraic
 
 cp = cypari2.Pari()
@@ -11,7 +11,7 @@ cp_x = cp('x')
 
 def cp_polynomial(coefficients):
     ''' Return a cypari2 polynomial from its coefficients. '''
-    return cp(' + '.join('{}*x^{}'.format(coefficient, index) for index, coefficient in enumerate(coefficients)))  # pylint: disable=consider-using-f-string
+    return cp(' + '.join(f'{coefficient}*x^{index}' for index, coefficient in enumerate(coefficients)))
 
 class RealNumberField(BaseRealNumberField):
     ''' Represents the NumberField QQ(lmbda) = QQ[x] / << f(x) >> where lmbda is a real root of f(x). '''
@@ -77,7 +77,7 @@ def eigenvectors(matrix):
                 a = cp_x.Mod(polynomial)
                 kernel_basis = (M - a).matker()
                 break
-            except cypari2._pari.PariError:
+            except cypari2.handle_error.PariError:
                 cp.allocatemem()
         
         eigenvalue = K.lmbda

@@ -84,7 +84,8 @@ class BaseRealAlgebraic(ABC):
     def __str__(self):
         return str(self.N())
     def __repr__(self):
-        return '{!r}([{}])'.format(self.field, ', '.join(str(coeff) for coeff in self.coefficients))  # pylint: disable=consider-using-f-string
+        coeffs = ', '.join(str(coeff) for coeff in self.coefficients)
+        return f'{self.field!r}([{coeffs}])'
     def __reduce__(self):
         return (self.field, (self.coefficients,))
     def __bool__(self):

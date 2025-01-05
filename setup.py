@@ -7,6 +7,7 @@ from setuptools import setup, find_packages
 
 requirements = [
     'numpy>=1.15.1',
+    'passagemath-pari>=10.5.18',
     'sympy>=1.6',
 ]
 
