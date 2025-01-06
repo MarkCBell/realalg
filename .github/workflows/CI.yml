@@ -12,19 +12,14 @@ jobs:
         include:
         - tox: lint
           python-version: "3.9"
-          py-ver: "39"
         - tox: py39
           python-version: "3.9"
-          py-ver: "39"
         - tox: py310
           python-version: "3.10"
-          py-ver: "310"
         - tox: py311
           python-version: "3.11"
-          py-ver: "311"
         - tox: py312
           python-version: "3.12"
-          py-ver: "312"
     runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout branch
@@ -33,13 +28,7 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Set up Cygwin
-      uses: egor-tensin/setup-cygwin@v4
-      if: runner.os == 'Windows'
-      with:
-        packages: gcc-core gcc-g++ python${{ matrix.py-ver }}-devel ninja pkgconf
     - name: Display Python version
-      shell: C:\tools\cygwin\bin\bash.exe --norc -eo pipefail -o igncr '{0}'
       run: |
         python -c "import sys; print(sys.version)"
         pip --version
