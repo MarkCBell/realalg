@@ -42,7 +42,7 @@ jobs:
         pip install --upgrade pip
         pip install tox
     - name: Run Tox
-      shell: bash
+      shell: C:\cygwin64\bin\bash.exe --login '{0}'
       run: |
         tox -- --hypothesis-profile=ci --durations=20
       env:
