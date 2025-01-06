@@ -42,6 +42,7 @@ jobs:
         pip install --upgrade pip
         pip install tox
     - name: Run Tox
+      shell: ${{ runner.os == 'Windows' && C:\tools\cygwin\bin\bash.exe || sh }}
       run: |
         tox -- --hypothesis-profile=ci --durations=20
       env:
