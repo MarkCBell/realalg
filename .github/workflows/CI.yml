@@ -39,7 +39,7 @@ jobs:
       with:
         packages: gcc-core gcc-g++ python${{ matrix.py-ver }}-devel ninja pkgconf
     - name: Display Python version
-      shell: C:\tools\cygwin\bin\bash.exe
+      shell: C:\tools\cygwin\bin\bash.exe '{0}'
       run: |
         python -c "import sys; print(sys.version)"
         pip --version
