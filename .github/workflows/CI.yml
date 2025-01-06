@@ -12,14 +12,19 @@ jobs:
         include:
         - tox: lint
           python-version: "3.9"
+          py-ver: "39"
         - tox: py39
           python-version: "3.9"
+          py-ver: "39"
         - tox: py310
           python-version: "3.10"
+          py-ver: "310"
         - tox: py311
           python-version: "3.11"
+          py-ver: "311"
         - tox: py312
           python-version: "3.12"
+          py-ver: "312"
     runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout branch
@@ -32,7 +37,7 @@ jobs:
       uses: egor-tensin/setup-cygwin@v4
       if: runner.os == 'Windows'
       with:
-        packages: gcc-core gcc-g++ python3${{ matrix.python-version }}-devel ninja pkgconf
+        packages: gcc-core gcc-g++ python${{ matrix.py-ver }}-devel ninja pkgconf
     - name: Display Python version
       run: |
         python -c "import sys; print(sys.version)"
@@ -42,7 +47,6 @@ jobs:
         pip install --upgrade pip
         pip install tox
     - name: Run Tox
-      shell: C:\cygwin64\bin\bash.exe --login '{0}'
       run: |
         tox -- --hypothesis-profile=ci --durations=20
       env:
