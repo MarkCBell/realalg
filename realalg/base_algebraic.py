@@ -85,6 +85,7 @@ class BaseRealAlgebraic(ABC):
         if not self.coefficients:
             self.coefficients = [Fraction(0, 1)]
         self.length = sum(LOG_2 + log_plus(coefficient.numerator) + log_plus(coefficient.denominator) + index * self.field.length for index, coefficient in enumerate(self.coefficients))
+        self._intervals = dict()
     def __str__(self):
         return str(self.N())
     def __repr__(self):
@@ -176,10 +177,13 @@ class BaseRealAlgebraic(ABC):
     
     def interval(self, accuracy=8):
         ''' Return an interval around self with at least the requested accuracy. '''
-        intermediate_accuracy = int(accuracy + max(log_plus(coefficient) for coefficient in self.coefficients) + len(self.coefficients)) + 1
-        interval = sum(coeff * interval for coeff, interval in zip(self.coefficients, self.field.intervals(intermediate_accuracy)))
-        assert interval.accuracy >= accuracy
-        return interval.simplify(accuracy+1)
+        if accuracy not in self._intervals:
+            intermediate_accuracy = int(accuracy + max(log_plus(coefficient) for coefficient in self.coefficients) + len(self.coefficients)) + 1
+            interval = sum(coeff * interval for coeff, interval in zip(self.coefficients, self.field.intervals(intermediate_accuracy)))
+            assert interval.accuracy >= accuracy
+            self._intervals[accuracy] = interval.simplify(accuracy + 1)
+        return self._intervals[accuracy] 
+    
     def N(self, accuracy=8):
         ''' Return a string approximating self to at least ``accuracy`` digits. '''
         return self.interval(accuracy).midpoint()
