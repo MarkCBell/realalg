@@ -39,7 +39,7 @@ class BaseRealNumberField:
             raise ValueError(f'Polynomial {self.sp_polynomial} has no real roots')
         self.sp_place = real_roots[index]
         self._accuracy = 0
-        self._intervals = dict()
+        self._intervals = dict()  # pylint:disable=use-dict-literal
         self.lmbda = None  # To be created by instances.
     
     def __str__(self):
@@ -53,6 +53,7 @@ class BaseRealNumberField:
     def __eq__(self, other):
         return self.coefficients == other.coefficients and self.index == other.index
     def find_root_as_interval(self, precision):
+        ''' Return an Interval around self.lmbda with at least the requested precision. '''
         s = str(sp.N(self.sp_place, precision))
         return Interval.from_string(s, precision)
     
@@ -85,7 +86,7 @@ class BaseRealAlgebraic(ABC):
         if not self.coefficients:
             self.coefficients = [Fraction(0, 1)]
         self.length = sum(LOG_2 + log_plus(coefficient.numerator) + log_plus(coefficient.denominator) + index * self.field.length for index, coefficient in enumerate(self.coefficients))
-        self._intervals = dict()
+        self._intervals = dict()  # pylint:disable=use-dict-literal
     def __str__(self):
         return str(self.N())
     def __repr__(self):
