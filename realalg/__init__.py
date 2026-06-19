@@ -7,7 +7,7 @@ __version__ = importlib.metadata.version('realalg')
 
 # from .algebraic import RealNumberField, RealAlgebraic  # noqa: F401
 
-INTERFACES = ['cypari', 'cypari2', 'sympy']
+INTERFACES = ['cypari2', 'cypari', 'sympy']
 for interface in INTERFACES:
     try:
         module = import_module(f'realalg.{interface}_algebraic')
