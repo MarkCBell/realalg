@@ -65,7 +65,7 @@ class BaseRealNumberField:
             interval = self.find_root_as_interval(precision)
             intervals = [interval**i for i in range(self.degree)]
             assert all(I.accuracy >= accuracy for I in intervals)
-            invervals = [I.simplify(accuracy+1) for I in intervals]
+            intervals = [I.simplify(accuracy+1) for I in intervals]
             self._intervals[accuracy] = intervals
             self._accuracy = max(accuracy, self._accuracy)
         return self._intervals[accuracy]
