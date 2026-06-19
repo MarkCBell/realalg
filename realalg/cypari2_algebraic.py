@@ -2,9 +2,13 @@
 ''' A module for representing and manipulating real algebraic numbers and the fields that they live in using cypari2. '''
 
 from fractions import Fraction
+from math import log2
 import numpy as np
 import cypari2  # pylint: disable=import-error
 from .base_algebraic import BaseRealNumberField, BaseRealAlgebraic
+from .interval import Interval
+
+LOG_10 = log2(10)
 
 cp = cypari2.Pari()
 cp_x = cp('x')
@@ -21,6 +25,15 @@ class RealNumberField(BaseRealNumberField):
         super().__init__(coefficients, index)
         self.cp_polynomial = cp_polynomial(self.coefficients)
         self.lmbda = self([0, 1])
+
+    def find_root_as_interval(self, precision):
+        bit_prec = int(LOG_10 * precision) + 1
+        old_bit_prec = cp.get_real_precision_bits()
+        cp.set_real_precision_bits(bit_prec)
+        roots = list(self.cp_polynomial.polrootsreal(precision=bit_prec))
+        s = str(roots[self.index])
+        cp.set_real_precision_bits(old_bit_prec)
+        return Interval.from_string(s, precision)
     
     def __call__(self, coefficients):
         return RealAlgebraic(self, cp_polynomial(coefficients).Mod(self.cp_polynomial))

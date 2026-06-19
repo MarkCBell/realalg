@@ -47,7 +47,7 @@ class BaseRealNumberField:
             raise ValueError(f'Polynomial {self.sp_polynomial} has no real roots')
         self.sp_place = real_roots[index]
         self._accuracy = 0
-        self._intervals = None
+        self._intervals = dict()  # pylint:disable=use-dict-literal
         self.lmbda = None  # To be created by instances.
     
     def __str__(self):
@@ -60,19 +60,24 @@ class BaseRealNumberField:
         return (self.__class__, (self.coefficients,))
     def __eq__(self, other):
         return self.coefficients == other.coefficients and self.index == other.index
+    def find_root_as_interval(self, precision):
+        ''' Return an Interval around self.lmbda with at least the requested precision. '''
+        s = str(sp.N(self.sp_place, precision))
+        return Interval.from_string(s, precision)
     
     def intervals(self, accuracy):
         ''' Return intervals around self.lmbda**i with at least the requested accuracy. '''
         assert isinstance(accuracy, Integral)
         assert accuracy > 0
-        if accuracy > self._accuracy:
+        if accuracy not in self._intervals:
             precision = int(accuracy + self.degree*self.log_bound + 1) + 1  # Cheap ceil.
-            s = str(sp.N(self.sp_place, precision))
-            interval = Interval.from_string(s, precision)
-            self._intervals = [interval**i for i in range(self.degree)]
-            assert all(I.accuracy >= accuracy for I in self._intervals)
-            self._accuracy = accuracy
-        return [I.simplify(accuracy+1) for I in self._intervals]
+            interval = self.find_root_as_interval(precision)
+            intervals = [interval**i for i in range(self.degree)]
+            assert all(I.accuracy >= accuracy for I in intervals)
+            intervals = [I.simplify(accuracy+1) for I in intervals]
+            self._intervals[accuracy] = intervals
+            self._accuracy = max(accuracy, self._accuracy)
+        return self._intervals[accuracy]
 
 @total_ordering
 class BaseRealAlgebraic(ABC):
@@ -89,6 +94,7 @@ class BaseRealAlgebraic(ABC):
         if not self.coefficients:
             self.coefficients = [Fraction(0, 1)]
         self.length = sum(LOG_2 + log_plus(coefficient.numerator) + log_plus(coefficient.denominator) + index * self.field.length for index, coefficient in enumerate(self.coefficients))
+        self._intervals = dict()  # pylint:disable=use-dict-literal
     def __str__(self):
         return str(self.N())
     def __repr__(self):
@@ -180,10 +186,13 @@ class BaseRealAlgebraic(ABC):
     
     def interval(self, accuracy=8):
         ''' Return an interval around self with at least the requested accuracy. '''
-        intermediate_accuracy = int(accuracy + max(log_plus(coefficient) for coefficient in self.coefficients) + len(self.coefficients)) + 1
-        interval = sum(coeff * interval for coeff, interval in zip(self.coefficients, self.field.intervals(intermediate_accuracy)))
-        assert interval.accuracy >= accuracy
-        return interval.simplify(accuracy+1)
+        if accuracy not in self._intervals:
+            intermediate_accuracy = int(accuracy + max(log_plus(coefficient) for coefficient in self.coefficients) + len(self.coefficients)) + 1
+            interval = sum(coeff * interval for coeff, interval in zip(self.coefficients, self.field.intervals(intermediate_accuracy)))
+            assert interval.accuracy >= accuracy
+            self._intervals[accuracy] = interval.simplify(accuracy + 1)
+        return self._intervals[accuracy]
+    
     def N(self, accuracy=8):
         ''' Return a string approximating self to at least ``accuracy`` digits. '''
         return self.interval(accuracy).midpoint()
