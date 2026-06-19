@@ -182,7 +182,7 @@ class BaseRealAlgebraic(ABC):
             interval = sum(coeff * interval for coeff, interval in zip(self.coefficients, self.field.intervals(intermediate_accuracy)))
             assert interval.accuracy >= accuracy
             self._intervals[accuracy] = interval.simplify(accuracy + 1)
-        return self._intervals[accuracy] 
+        return self._intervals[accuracy]
     
     def N(self, accuracy=8):
         ''' Return a string approximating self to at least ``accuracy`` digits. '''
