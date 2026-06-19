@@ -2,6 +2,13 @@
 History
 =======
 
+0.3.7 (2026-06-20)
+------------------
+
+* Speedup via caching more intervals (from Nathan Dunfield)
+* Prefer cypari2 to cypari
+* Disable Python set_int_max_str_digits
+
 0.3.6 (2024-09-18)
 ------------------
 
