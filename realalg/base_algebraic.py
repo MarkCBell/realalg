@@ -6,6 +6,8 @@ from fractions import Fraction
 from functools import total_ordering
 from math import log10 as log
 from numbers import Integral
+import sys
+
 import sympy as sp
 
 from .interval import Interval
@@ -13,6 +15,12 @@ from .interval import Interval
 sp_x = sp.Symbol('x')
 sp_QQ_x = sp.QQ.old_poly_ring(sp_x)
 LOG_2 = log(2)
+
+# By default, Python will only convert a decimal string of length at
+# most 4300 to an integer to protect against DDOS attacks; not relevant
+# here (CVE-2020-10735).
+if hasattr(sys, 'set_int_max_str_digits'):
+    sys.set_int_max_str_digits(0)
 
 def log_plus(x):
     ''' Return the height of the number ``x``. '''
